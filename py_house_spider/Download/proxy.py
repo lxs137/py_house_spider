@@ -12,5 +12,5 @@ class ProxyMiddleware(object):
     def process_request(self, request, spider):
         request.meta['proxy'] = random.choice(self.ipList)
         # request.meta['proxy'] = 'http://202.106.16.36:3128'
-        print('My proxy:', request.meta['proxy'])
+        # print('My proxy:', request.meta['proxy'])
 

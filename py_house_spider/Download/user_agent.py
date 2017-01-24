@@ -1,7 +1,4 @@
-import requests
-import re
 import random
-import time
 class UserAgentMiddleware(object):
     def __init__(self):
         self.user_agent_list = [
@@ -27,4 +24,4 @@ class UserAgentMiddleware(object):
 
     def process_request(self, request, spider):
         request.headers['User-Agent'] = str(random.choice(self.user_agent_list))
-        print('My User-Agent:', request.headers['User-Agent'])
+        # print('My User-Agent:', request.headers['User-Agent'])
