@@ -5,13 +5,12 @@ class URLItem(scrapy.Item):
 
 class CommunityItem(scrapy.Item):
     name = scrapy.Field()
+    region = scrapy.Field()
     page_url = scrapy.Field()
     price_cur = scrapy.Field()
     ratio_month = scrapy.Field()
     address = scrapy.Field()
     character = scrapy.Field()
-    address = scrapy.Field()
-    region = scrapy.Field()
     property = scrapy.Field()
     manage_type = scrapy.Field()
     done_time = scrapy.Field()

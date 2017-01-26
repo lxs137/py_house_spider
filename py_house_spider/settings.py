@@ -55,7 +55,7 @@ ROBOTSTXT_OBEY = False
 DOWNLOADER_MIDDLEWARES = {
     'scrapy.contrib.downloadermiddleware.useragent.UserAgentMiddleware': 401,
     # 'scrapy.contrib.downloadermiddleware.httpproxy.HttpProxyMiddleware': 101,
-    # 'py_house.Download.proxy.ProxyMiddleware': 100,
+    # 'py_house_spider.Download.proxy.ProxyMiddleware': 100,
     'py_house_spider.Download.user_agent.UserAgentMiddleware': 400,
 }
 
@@ -91,3 +91,4 @@ DOWNLOADER_MIDDLEWARES = {
 # HTTPCACHE_DIR = 'httpcache'
 # HTTPCACHE_IGNORE_HTTP_CODES = []
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+
