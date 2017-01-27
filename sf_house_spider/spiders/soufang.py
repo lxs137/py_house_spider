@@ -1,8 +1,9 @@
 from bs4 import BeautifulSoup
 from scrapy.http import Request
+from scrapy.shell import inspect_response
 import scrapy
-from py_house_spider.items import URLItem
-from py_house_spider.items import CommunityItem
+from sf_house_spider.items import URLItem
+from sf_house_spider.items import CommunityItem
 
 class CommunitySpider(scrapy.Spider):
     name = 'community_spider'
@@ -75,6 +76,7 @@ class CommunitySpider(scrapy.Spider):
                     pass
 
     def get_community_info(self, response):
+        inspect_response(response, self)
         info = CommunityItem()
         soup = BeautifulSoup(response.body, 'lxml')
         info['name'] = soup.find('a', attrs={'class': 'tt'}).get_text()
