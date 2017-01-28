@@ -10,7 +10,7 @@ class CommunityItem(scrapy.Item):
     price_cur = scrapy.Field()
     ratio_month = scrapy.Field()
     address = scrapy.Field()
-    character = scrapy.Field()
+    community_feature = scrapy.Field()
     property = scrapy.Field()
     manage_type = scrapy.Field()
     done_time = scrapy.Field()

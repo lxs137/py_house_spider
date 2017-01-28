@@ -67,10 +67,10 @@ DOWNLOADER_MIDDLEWARES = {
 
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
-# ITEM_PIPELINES = {
-#    # 'py_house.pipelines.SomePipeline': 300,
-#     'sf_house_spider.Pipelines.sf_db_pipeline': 1,
-# }
+ITEM_PIPELINES = {
+   # 'py_house.pipelines.SomePipeline': 300,
+    'sf_house_spider.Pipelines.sf_db_pipeline.SFDataBasePipeline': 1,
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See http://doc.scrapy.org/en/latest/topics/autothrottle.html
