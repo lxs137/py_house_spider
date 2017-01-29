@@ -6,13 +6,13 @@ from sf_house_spider.items import URLItem
 from sf_house_spider.items import CommunityItem
 
 class CommunitySpider(scrapy.Spider):
-    name = 'community_spider'
+    name = 'sf_community_spider'
     # 限制爬取的域名范围
     # allowed_domains = ['esf.nanjing.fang.com']
     base_url = 'http://esf.nanjing.fang.com/housing/'
-    community = [u'鼓楼', u'江宁', u'浦口', u'玄武', u'建邺', u'栖霞', u'雨花',
-                 u'秦淮', u'六合', u'溧水', u'高淳', u'南京周边']
-    # community = [u'鼓楼', u'江宁']
+    # community = [u'鼓楼', u'江宁', u'浦口', u'玄武', u'建邺', u'栖霞', u'雨花',
+    #              u'秦淮', u'六合', u'溧水', u'高淳', u'南京周边']
+    community = [u'鼓楼', u'江宁']
     community_code = {u'鼓楼': '265', u'江宁': '268', u'浦口': '270', u'玄武': '264',
                       u'建邺': '267', u'栖霞': '271', u'雨花': '272', u'秦淮': '263',
                       u'六合': '269', u'溧水': '274', u'高淳': '275', u'南京周边': '13046'}
@@ -31,8 +31,8 @@ class CommunitySpider(scrapy.Spider):
         # 获得每个区域的小区列表的页数
         page_str = soup.find('span', attrs={'class': 'fy_text'}).get_text()
         max_page = int(page_str[(page_str.find('/')+1):])
-        # for i in range(1, 3):
-        for i in range(1, max_page+1):
+        for i in range(1, 3):
+        # for i in range(1, max_page+1):
             region_page_url = str(response.url).replace('1_0_0', str(i)+'_0_0')
             yield Request(region_page_url, callback=self.get_community_url,
                           meta={'region': response.meta['region']})
@@ -81,6 +81,10 @@ class CommunitySpider(scrapy.Spider):
         info['name'] = soup.find('a', attrs={'class': 'tt'}).get_text()
         info['region'] = response.meta['region']
         info['page_url'] = response.url
+        title_div = soup.find('div', attrs={'id': 'orginalNaviBox'})
+        info['sell_url'] = title_div.find('a', string='二手房')['href']
+        info['rent_url'] = title_div.find('a', string='租房')['href']
+        info['record_url'] = title_div.find('a', string='小区成交')['href']
         info['price_cur'] = response.meta['priceAverage']
         info['ratio_month'] = response.meta['ratio']
         box_list = soup.find_all('div', attrs={'class': 'box'})
@@ -142,12 +146,23 @@ class CommunitySpider(scrapy.Spider):
 
     def get_info_dict(self, box):
         dd_list = box.find('dl').find_all('dd')
+        dt_list = box.find('dl').find_all('dt')
+        dd_list.extend(dt_list)
         result_dict = {}
         for dd in dd_list:
-            # 去掉字符串中的空格
-            text = ''.join((dd.get_text()).split())
-            if text.find('...') == -1:
-                result_dict[text[:text.find('：')]] = text[text.find('：')+1:]
+            if str(dd).find('<br/>') != -1:
+                str_list = str(dd)[4:-5].split('<br/>')
+                for li in str_list:
+                    text = ''.join(li.split())
+                    if text.find('...') == -1:
+                        result_dict[text[:text.find('：')]] = text[text.find('：') + 1:]
+                    else:
+                        result_dict[text[:text.find('：')]] = dd.get('title')
             else:
-                result_dict[text[:text.find('：')]] = dd.get('title')
+                # 去掉字符串中的空格
+                text = ''.join((dd.get_text()).split())
+                if text.find('...') == -1:
+                    result_dict[text[:text.find('：')]] = text[text.find('：')+1:]
+                else:
+                    result_dict[text[:text.find('：')]] = dd.get('title')
         return result_dict

@@ -26,7 +26,7 @@ class MySQLConnectorSF(object):
     @classmethod
     def insert_community_info(cls, info_dict):
         insert_command = 'INSERT INTO community_info( \
-                         name,page_url,price_cur,ratio_month,address, \
+                         name,page_url,sell_url,rent_url,record_url,price_cur,ratio_month,address, \
                          community_feature,region,property,manage_type,done_time, \
                          build_company,building_type,building_area,cover_area, \
                          house_num_cur,house_num_sum,green_rate,volum_rate, \
@@ -34,7 +34,7 @@ class MySQLConnectorSF(object):
                          network,elector,security,sanitation,parking,metro,bus,car, \
                          kindergarten,school,university,shop_mall,hospital,post_office, \
                          bank,other_facility)\
-                         VALUES (%(name)s, %(page_url)s, %(price_cur)s, %(ratio_month)s,\
+                         VALUES (%(name)s, %(page_url)s, %(sell_url)s, %(rent_url)s, %(record_url), s%(price_cur)s, %(ratio_month)s,\
                          %(address)s, %(community_feature)s, %(region)s, %(property)s,\
                          %(manage_type)s, %(done_time)s, %(build_company)s,\
                          %(building_type)s, %(building_area)s, %(cover_area)s,\
@@ -45,7 +45,6 @@ class MySQLConnectorSF(object):
                          %(car)s, %(kindergarten)s, %(school)s, %(university)s,\
                          %(shop_mall)s, %(hospital)s, %(post_office)s, %(bank)s,\
                          %(other_facility)s)'
-        print(insert_command%info_dict)
         cls.cursor.execute(insert_command, info_dict)
         cls.cnx.commit()
         pass

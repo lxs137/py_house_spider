@@ -1,2 +1,2 @@
 from scrapy.cmdline import execute
-execute(['scrapy', 'crawl', 'community_spider'])
+execute(['scrapy', 'crawl', 'sf_community_spider'])
