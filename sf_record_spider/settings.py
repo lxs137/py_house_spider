@@ -9,10 +9,10 @@
 #     http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
 #     http://scrapy.readthedocs.org/en/latest/topics/spider-middleware.html
 
-BOT_NAME = 'sf_house_spider'
+BOT_NAME = 'sf_record_spider'
 
-SPIDER_MODULES = ['sf_house_spider.spiders']
-NEWSPIDER_MODULE = 'sf_house_spider.spiders'
+SPIDER_MODULES = ['sf_record_spider.spiders']
+NEWSPIDER_MODULE = 'sf_record_spider.spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
@@ -55,8 +55,8 @@ COOKIES_ENABLED = False
 DOWNLOADER_MIDDLEWARES = {
     'scrapy.contrib.downloadermiddleware.useragent.UserAgentMiddleware': 401,
     'scrapy.contrib.downloadermiddleware.httpproxy.HttpProxyMiddleware': 101,
-    'sf_house_spider.Download.proxy.ProxyMiddleware': 100,
-    'sf_house_spider.Download.user_agent.UserAgentMiddleware': 400,
+    'sf_record_spider.Download.proxy.ProxyMiddleware': 100,
+    'sf_record_spider.Download.user_agent.UserAgentMiddleware': 400,
 }
 
 # Enable or disable extensions
@@ -69,7 +69,7 @@ DOWNLOADER_MIDDLEWARES = {
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
    # 'py_house.pipelines.SomePipeline': 300,
-    'sf_house_spider.Pipelines.sf_db_pipeline.SFDataBasePipeline': 1,
+   #  'sf_house_spider.Pipelines.sf_db_pipeline.SFDataBasePipeline': 1,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

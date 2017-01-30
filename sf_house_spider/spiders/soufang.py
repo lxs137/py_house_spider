@@ -2,17 +2,17 @@ from bs4 import BeautifulSoup
 from scrapy.http import Request
 from scrapy.shell import inspect_response
 import scrapy
-from sf_house_spider.items import URLItem
 from sf_house_spider.items import CommunityItem
+from sf_house_spider.Pipelines.mysql import MySQLConnectorSF
 
 class CommunitySpider(scrapy.Spider):
     name = 'sf_community_spider'
     # 限制爬取的域名范围
     # allowed_domains = ['esf.nanjing.fang.com']
     base_url = 'http://esf.nanjing.fang.com/housing/'
-    # community = [u'鼓楼', u'江宁', u'浦口', u'玄武', u'建邺', u'栖霞', u'雨花',
-    #              u'秦淮', u'六合', u'溧水', u'高淳', u'南京周边']
-    community = [u'鼓楼', u'江宁']
+    community = [u'鼓楼', u'江宁', u'浦口', u'玄武', u'建邺', u'栖霞', u'雨花',
+                 u'秦淮', u'六合', u'溧水', u'高淳', u'南京周边']
+    # community = [u'鼓楼', u'江宁']
     community_code = {u'鼓楼': '265', u'江宁': '268', u'浦口': '270', u'玄武': '264',
                       u'建邺': '267', u'栖霞': '271', u'雨花': '272', u'秦淮': '263',
                       u'六合': '269', u'溧水': '274', u'高淳': '275', u'南京周边': '13046'}
@@ -31,8 +31,8 @@ class CommunitySpider(scrapy.Spider):
         # 获得每个区域的小区列表的页数
         page_str = soup.find('span', attrs={'class': 'fy_text'}).get_text()
         max_page = int(page_str[(page_str.find('/')+1):])
-        for i in range(1, 3):
-        # for i in range(1, max_page+1):
+        # for i in range(1, 3):
+        for i in range(1, max_page+1):
             region_page_url = str(response.url).replace('1_0_0', str(i)+'_0_0')
             yield Request(region_page_url, callback=self.get_community_url,
                           meta={'region': response.meta['region']})
@@ -46,7 +46,14 @@ class CommunitySpider(scrapy.Spider):
             community_type = community_item.find('span', attrs={'class': 'plotFangType'}).get_text()
             if community_url.find('http://') != -1:
                 if community_type == u'住宅' or community_type == u'别墅':
-
+                    # 得到详情页的地址,根据是否是别墅采取不同的地址编址方式
+                    if community_url.find('/villa/') == -1:
+                        community_url = community_url[:community_url.find('.com')] +'.com/xiangqing/'
+                    else:
+                        community_url = community_url[:community_url.find('/villa/')] +'/villa/xiangqing/'
+                    # 判断小区数据是否已经存在于数据库中
+                    if MySQLConnectorSF.select_if_exist(community_url):
+                        continue
                     # Get priceAverage and ratio
                     meta_request = {'region': response.meta['region']}
                     price_tag = community_item.find('p', attrs={'class': 'priceAverage'})
@@ -65,11 +72,6 @@ class CommunitySpider(scrapy.Spider):
                                 meta_request['ratio'] = float((ratio_tag.get_text())[1:-1])
                             elif class_list.count('green') == 1:
                                 meta_request['ratio'] = -1*float((ratio_tag.get_text())[1:-1])
-                    # 得到详情页的地址,根据是否是别墅采取不同的地址编址方式
-                    if community_url.find('/villa/') == -1:
-                        community_url = community_url[:community_url.find('.com')] +'.com/xiangqing/'
-                    else:
-                        community_url = community_url[:community_url.find('/villa/')] +'/villa/xiangqing/'
                     # print(community_url)
                     yield Request(community_url, callback=self.get_community_info, meta=meta_request)
                 elif community_type == u'商铺' or community_type == u'写字楼':

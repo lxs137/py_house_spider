@@ -34,7 +34,7 @@ class MySQLConnectorSF(object):
                          network,elector,security,sanitation,parking,metro,bus,car, \
                          kindergarten,school,university,shop_mall,hospital,post_office, \
                          bank,other_facility)\
-                         VALUES (%(name)s, %(page_url)s, %(sell_url)s, %(rent_url)s, %(record_url), s%(price_cur)s, %(ratio_month)s,\
+                         VALUES (%(name)s, %(page_url)s, %(sell_url)s, %(rent_url)s, %(record_url)s, %(price_cur)s, %(ratio_month)s,\
                          %(address)s, %(community_feature)s, %(region)s, %(property)s,\
                          %(manage_type)s, %(done_time)s, %(build_company)s,\
                          %(building_type)s, %(building_area)s, %(cover_area)s,\
@@ -48,4 +48,13 @@ class MySQLConnectorSF(object):
         cls.cursor.execute(insert_command, info_dict)
         cls.cnx.commit()
         pass
-    pass
+
+    @classmethod
+    def select_if_exist(cls, page_url):
+        select_command = 'SELECT EXISTS(SELECT 1 FROM community_info WHERE page_url=%(page_url)s)'
+        value = {'page_url': page_url}
+        cls.cursor.execute(select_command, value)
+        if cls.cursor.fetchall()[0][0] == 1:
+            return True
+        else:
+            return False
