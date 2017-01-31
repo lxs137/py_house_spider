@@ -24,6 +24,13 @@ class MySQLConnectorSF(object):
 
     @classmethod
     def select_community_url(cls):
-        select_command = 'SELECT sell_url,rent_url,record_url FROM community_info'
-        cls.cursor.execute(select_command)
-        return cls.cursor.fetchall()
+        # select_command = 'SELECT sell_url,rent_url,record_url,community_info_id FROM community_info'
+        # cls.cursor.execute(select_command)
+        # return cls.cursor.fetchall()
+        return [('http://zhongyanggongyuanbl025.fang.com/chushou/'
+                 , 'http://zhongyanggongyuanbl025.fang.com/chuzu/'
+                 , 'http://zhongyanggongyuanbl025.fang.com/chengjiao/')]
+
+    @classmethod
+    def insert_sell_info(cls):
+        pass
