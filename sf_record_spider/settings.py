@@ -69,7 +69,7 @@ DOWNLOADER_MIDDLEWARES = {
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
    # 'py_house.pipelines.SomePipeline': 300,
-   #  'sf_house_spider.Pipelines.sf_db_pipeline.SFDataBasePipeline': 1,
+    'sf_record_spider.Pipelines.sf_db_pipeline.SFDataBasePipeline': 1,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -84,6 +84,9 @@ ITEM_PIPELINES = {
 #AUTOTHROTTLE_TARGET_CONCURRENCY = 1.0
 # Enable showing throttling stats for every response received:
 #AUTOTHROTTLE_DEBUG = False
+
+# Set Log Level
+LOG_LEVEL = 'INFO'
 
 # Enable and configure HTTP caching (disabled by default)
 # See http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html#httpcache-middleware-settings
