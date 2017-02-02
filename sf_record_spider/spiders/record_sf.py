@@ -16,9 +16,16 @@ class RecordSpider(scrapy.Spider):
             rent_url = sql_tuple[1]
             record_url = sql_tuple[2]
             community_id = sql_tuple[3]
-            yield Request(sell_url, callback=self.sell_page_list, meta={'base_url': sell_url, 'community_id': community_id})
-            yield Request(rent_url, callback=self.rent_page_list, meta={'base_url': rent_url, 'community_id': community_id})
-            yield Request(record_url, callback=self.record_page_list, meta={'base_url': record_url, 'community_id': community_id})
+            record_sell_url = record_url + '-p11-t11/'
+            record_rent_url = record_url + '-p11-t12/'
+            yield Request(sell_url, callback=self.sell_page_list,
+                          meta={'base_url': sell_url, 'community_id': community_id})
+            yield Request(rent_url, callback=self.rent_page_list,
+                          meta={'base_url': rent_url, 'community_id': community_id})
+            # yield Request(record_sell_url, callback=self.record_sell_page_list,
+            #               meta={'base_url': record_url, 'community_id': community_id})
+            # yield Request(record_rent_url, callback=self.record_rent_page_list,
+            #               meta={'base_url': record_url, 'community_id': community_id})
 
     def sell_page_list(self, response):
         soup = BeautifulSoup(response.body, 'html5lib')
@@ -134,22 +141,77 @@ class RecordSpider(scrapy.Spider):
             tag_content = ''.join(tag_content.split())
             tag_content = tag_content[tag_content.find('：')+1:]
             if tag_name.find('租金') != -1:
-                rent_item['price'] = int(float(re.search(r'[0-9]+元', tag_content).group()))
+                rent_item['price'] = int(float(re.search(r'[0-9]+元', tag_content).group()[:-1]))
                 rent_item['pay_type'] = re.search('\[.*\]', tag_content).group()[1:-1]
-                rent_item['rate']
-                pass
+                try:
+                    rent_item['rate'] = float((re.search(r'[0-9|.|-]+%', tag_content).group())[:-1])
+                except:
+                    rent_item['rate'] = 0.00
             elif tag_name.find('房屋概况') != -1:
-                pass
-            elif tag_name.find('小区') != -1:
-                pass
-            elif tag_name.find('地址') != -1:
-                pass
+                content_list = tag_content.split('|')
+                for content in content_list:
+                    if re.search('[东|南|西|北]+', content) != None:
+                        rent_item['direction'] = content
+                    elif content.find('装修') != -1:
+                        rent_item['decoration'] = content
+                    elif content.find('层') != -1:
+                        rent_item['floor'] = content
+                    elif content.find('�O') != -1:
+                        rent_item['area_build'] = int(float(re.search('[0-9]+', content).group()))
+                    elif re.search('[0-9]+室', content) != None:
+                        rent_item['house_model'] = content
+                    else:
+                        rent_item['house_type'] = content
+        js_text = soup.find('script').get_text()
+        support_list = re.search("'.*'", re.search(r'var peitao.*;', js_text).group()).group()[1:-1].split(',')
+        support_attr_list = ['support_bed', 'support_furniture', 'support_gas', 'support_warm',
+                           'support_network', 'support_tv', 'support_condition', 'support_fridge',
+                           'support_wash', 'support_water']
+        support_attr_dict = {'support_bed': '床', 'support_furniture': '家具', 'support_gas': '煤气/天然气',
+                             'support_warm': '暖气', 'support_network': '宽带', 'support_tv': '有线电视',
+                             'support_condition': '空调', 'support_fridge': '冰箱',
+                             'support_wash': '洗衣机', 'support_water': '热水器'}
+        for support_attr in support_attr_list:
+            if support_list.count(support_attr_dict[support_attr]) != 0:
+                rent_item[support_attr] = 1
+            else:
+                rent_item[support_attr] = 0
+        yield rent_item
 
+    def record_rent_page_list(self, response):
+        soup = BeautifulSoup(response.body, 'html5lib')
+        page_url = soup.find('div', attrs={'class': 'detailTitle'})\
+            .find('div', attrs={'class': 'frpageChange'})\
+            .find('span', attrs={'class': 'ml10'}).get_text()
+        max_page = int(page_url[page_url.find('/')+1:])
+        for i in range(1, max_page+1):
+            url = response.meta['base_url']+'-p1'+str(i)+'-t12/'
+            yield Request(url, callback=self.parse_record_rent_list
+                          , meta={'community_id': response.meta['community_id']})
 
-    def record_page_list(self, response):
+    def record_sell_page_list(self, response):
+        soup = BeautifulSoup(response.body, 'html5lib')
+        page_url = soup.find('div', attrs={'class': 'detailTitle'})\
+            .find('div', attrs={'class': 'frpageChange'})\
+            .find('span', attrs={'class': 'ml10'}).get_text()
+        max_page = int(page_url[page_url.find('/')+1:])
+        for i in range(1, max_page+1):
+            url = response.meta['base_url']+'-p1'+str(i)+'-t11/'
+            yield Request(url, callback=self.parse_record_sell_list
+                          , meta={'community_id': response.meta['community_id']})
+
+    def parse_record_sell_list(self, response):
+        soup = BeautifulSoup(response.body, 'html5lib')
+        tr_list = soup.find('div', attrs={'class': 'tableWrap'})\
+            .find('table').find('tbody').find_all('tr')
+        if tr_list[0].find('th') != None:
+            del tr_list[0]
+        for tr_item in tr_list:
+            td_list = tr_item.find_all('td')
+
         pass
 
-    def parse_record_list(self, response):
+    def parse_record_rent_list(self, response):
         pass
 
     def parse_pay_params(self, response):
