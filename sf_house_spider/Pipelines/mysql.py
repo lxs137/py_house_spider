@@ -51,7 +51,7 @@ class MySQLConnectorSF(object):
 
     @classmethod
     def insert_community_info(cls, info_dict):
-        insert_command = 'INSERT INTO community_info( \
+        insert_command = 'INSERT INTO community_info'+cls.time_str+'( \
                          name,page_url,sell_url,rent_url,record_url,price_cur,ratio_month,address, \
                          community_feature,region,property,manage_type,done_time, \
                          build_company,building_type,building_area,cover_area, \
@@ -77,7 +77,7 @@ class MySQLConnectorSF(object):
 
     @classmethod
     def select_if_exist(cls, page_url):
-        select_command = 'SELECT EXISTS(SELECT 1 FROM community_info WHERE page_url=%(page_url)s)'
+        select_command = 'SELECT EXISTS(SELECT 1 FROM community_info'+cls.time_str+' WHERE page_url=%(page_url)s)'
         value = {'page_url': page_url}
         cls.cursor.execute(select_command, value)
         if cls.cursor.fetchall()[0][0] == 1:

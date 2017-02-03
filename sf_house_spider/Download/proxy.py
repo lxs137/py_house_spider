@@ -15,7 +15,7 @@ class ProxyMiddleware(object):
             proxy = {'http': 'http://'+ip,
                      'https': 'https://'+ip}
             try:
-                r = requests.get('http://www.baidu.com/', proxies=proxy, timeout=1, verify=False)
+                r = requests.get('http://www.baidu.com/', proxies=proxy, timeout=3, verify=False)
                 if r.status_code == 200:
                     self.ipList.append('http://'+ip)
             except Exception as e:
