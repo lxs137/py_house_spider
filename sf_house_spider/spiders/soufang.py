@@ -19,8 +19,8 @@ class CommunitySpider(scrapy.Spider):
     community_url_num = {u'鼓楼': 0, u'江宁': 0, u'浦口': 0, u'玄武': 0, u'建邺': 0, u'栖霞': 0,
                          u'雨花': 0, u'秦淮': 0, u'六合': 0, u'溧水': 0, u'高淳': 0, u'南京周边': 0}
 
-
     def start_requests(self):
+        MySQLConnectorSF.create_table()
         for one_community in self.community:
             code = self.community_code[one_community]
             region_url = self.base_url + code + '__0_0_0_0_1_0_0/'
@@ -35,7 +35,7 @@ class CommunitySpider(scrapy.Spider):
         for i in range(1, max_page+1):
             region_page_url = str(response.url).replace('1_0_0', str(i)+'_0_0')
             yield Request(region_page_url, callback=self.get_community_url,
-                          meta={'region': response.meta['region']})
+                          meta={'region': response.meta['region']}, dont_filter=True)
 
     def get_community_url(self, response):
         # lxml不能正确解析页面,采用html5lib作为解码器

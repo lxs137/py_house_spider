@@ -1,6 +1,7 @@
 import mysql.connector
 from mysql.connector import errorcode
 from sf_house_spider import settings
+import time
 
 class MySQLConnectorSF(object):
     try:
@@ -17,6 +18,31 @@ class MySQLConnectorSF(object):
             print(error)
     else:
         cursor = cnx.cursor(buffered=True)
+        time_str = time.strftime('_%Y_%m_%d', time.localtime())
+
+    @classmethod
+    def create_table(cls):
+        create_command = 'CREATE TABLE community_info'+cls.time_str+'(community_info_id'\
+                         ' int NOT NULL PRIMARY KEY AUTO_INCREMENT,name varchar(100),'\
+                         'page_url varchar(255),sell_url varchar(255),rent_url varchar(255),'\
+                         'record_url varchar(255),price_cur int,ratio_month float,'\
+                         'address varchar(255),community_feature varchar(100),'\
+                         'region varchar(100),property varchar(100),manage_type varchar(100),'\
+                         'done_time date,build_company varchar(100),building_type varchar(100),'\
+                         'building_area int,cover_area int,house_num_cur smallint,house_num_sum smallint,'\
+                         'green_rate float,volum_rate float,manage_price float,info_add varchar(100),'\
+                         'water_price varchar(50),electric_price varchar(50),gas_price varchar(50),'\
+                         'network varchar(50),elector varchar(50),security varchar(50),sanitation varchar(50),'\
+                         'parking varchar(50),metro varchar(50),bus varchar(50),car varchar(50),'\
+                         'kindergarten varchar(50),school varchar(50),university varchar(50),shop_mall varchar(50),'\
+                         'hospital varchar(50),post_office varchar(50),bank varchar(50),other_facility varchar(50))'\
+                         'engine=innodb default charset=utf8'
+        try:
+            cls.cursor.execute(create_command)
+        except mysql.connector.Error as err:
+            if err.errno == errorcode.ER_TABLE_EXISTS_ERROR:
+                print('Table exist.')
+        cls.cnx.commit()
 
     @classmethod
     def close_connect(cls):

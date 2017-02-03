@@ -2,7 +2,7 @@ from sf_record_spider.Pipelines.mysql import MySQLConnectorSF
 from scrapy.exceptions import DropItem
 import re
 from datetime import date
-from sf_record_spider.items import SellItem,RentItem
+from sf_record_spider.items import SellItem, RentItem, RecordSellItem, RecordRentItem
 class SFDataBasePipeline(object):
 
     def process_item(self, item, spider):
@@ -63,4 +63,30 @@ class SFDataBasePipeline(object):
                 MySQLConnectorSF.insert_rent_info(insert_dict, item['community_id'])
             else:
                 raise DropItem('RentItem: Missing community_info_id.')
-
+        elif isinstance(item, RecordSellItem):
+            insert_dict = {}
+            if item['community_id']:
+                insert_dict['house_model'] = item.get('house_model')
+                insert_dict['floor'] = item.get('floor')
+                insert_dict['direction'] = item.get('direction')
+                insert_dict['area_build'] = item.get('area_build')
+                time_list = item.get('sell_time').split('-')
+                insert_dict['sell_time'] = date(int(time_list[0]), int(time_list[1]), int(time_list[2]))
+                insert_dict['price_all'] = item['price_all']
+                insert_dict['price_per'] = item['price_per']
+                MySQLConnectorSF.insert_record_sell_info(insert_dict, item['community_id'])
+            else:
+                raise DropItem('RecordSellItem: Missing community_info_id.')
+        elif isinstance(item, RecordRentItem):
+            insert_dict = {}
+            if item['community_id']:
+                insert_dict['house_model'] = item.get('house_model')
+                insert_dict['floor'] = item.get('floor')
+                insert_dict['direction'] = item.get('direction')
+                insert_dict['area_build'] = item.get('area_build')
+                time_list = item.get('sell_time').split('-')
+                insert_dict['sell_time'] = date(int(time_list[0]), int(time_list[1]), int(time_list[2]))
+                insert_dict['price'] = item['price']
+                MySQLConnectorSF.insert_record_rent_info(insert_dict, item['community_id'])
+            else:
+                raise DropItem('RecordRentItem: Missing community_info_id.')

@@ -41,3 +41,22 @@ class RentItem(scrapy.Item):
     support_wash = scrapy.Field()
     support_water = scrapy.Field()
 
+class RecordSellItem(scrapy.Item):
+    community_id = scrapy.Field()
+    house_model = scrapy.Field()
+    floor = scrapy.Field()
+    direction = scrapy.Field()
+    area_build = scrapy.Field()
+    sell_time = scrapy.Field()
+    price_all = scrapy.Field()
+    price_per = scrapy.Field()
+
+class RecordRentItem(scrapy.Item):
+    community_id = scrapy.Field()
+    house_model = scrapy.Field()
+    floor = scrapy.Field()
+    direction = scrapy.Field()
+    area_build = scrapy.Field()
+    sell_time = scrapy.Field()
+    price = scrapy.Field()
+

@@ -1,14 +1,15 @@
 import scrapy
 from scrapy.http import Request
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup,NavigableString
 import re
 from sf_record_spider.Pipelines.mysql import MySQLConnectorSF
-from sf_record_spider.items import SellItem,RentItem
+from sf_record_spider.items import SellItem, RentItem, RecordSellItem, RecordRentItem
 class RecordSpider(scrapy.Spider):
     name = 'sf_record_spider'
     pay_params_url = 'http://dai.fangtx.com/new/ReferenceYueG/index.html'
     month_pay_params = {'year_num': 30, 'rate': ['0.0475', '0.049', '0.0275', '0.0325'], 'cheng_num': 7}
     def start_requests(self):
+        MySQLConnectorSF.create_tables()
         sql_list = MySQLConnectorSF.select_community_url()
         yield Request(self.pay_params_url, callback=self.parse_pay_params)
         for sql_tuple in sql_list:
@@ -22,10 +23,10 @@ class RecordSpider(scrapy.Spider):
                           meta={'base_url': sell_url, 'community_id': community_id})
             yield Request(rent_url, callback=self.rent_page_list,
                           meta={'base_url': rent_url, 'community_id': community_id})
-            # yield Request(record_sell_url, callback=self.record_sell_page_list,
-            #               meta={'base_url': record_url, 'community_id': community_id})
-            # yield Request(record_rent_url, callback=self.record_rent_page_list,
-            #               meta={'base_url': record_url, 'community_id': community_id})
+            yield Request(record_sell_url, callback=self.record_sell_page_list,
+                          meta={'base_url': record_url, 'community_id': community_id})
+            yield Request(record_rent_url, callback=self.record_rent_page_list,
+                          meta={'base_url': record_url, 'community_id': community_id})
 
     def sell_page_list(self, response):
         soup = BeautifulSoup(response.body, 'html5lib')
@@ -35,7 +36,8 @@ class RecordSpider(scrapy.Spider):
         base_url = response.meta['base_url']
         for i in range(1, max_page+1):
             page_url = base_url+'list/-h332-i3'+str(i)+'/'
-            yield Request(page_url, callback=self.parse_sell_list, meta={'community_id': response.meta['community_id']})
+            yield Request(page_url, callback=self.parse_sell_list
+                          , meta={'community_id': response.meta['community_id']}, dont_filter=True)
 
     def parse_sell_list(self, response):
         soup = BeautifulSoup(response.body, 'html5lib')
@@ -109,7 +111,8 @@ class RecordSpider(scrapy.Spider):
         base_url = response.meta['base_url']
         for i in range(1, max_page+1):
             page_url = base_url+'list/h322-i3'+str(i)+'/'
-            yield Request(page_url, callback=self.parse_rent_list, meta={'community_id': response.meta['community_id']})
+            yield Request(page_url, callback=self.parse_rent_list
+                          , meta={'community_id': response.meta['community_id']}, dont_filter=True)
         pass
 
     def parse_rent_list(self, response):
@@ -187,7 +190,7 @@ class RecordSpider(scrapy.Spider):
         for i in range(1, max_page+1):
             url = response.meta['base_url']+'-p1'+str(i)+'-t12/'
             yield Request(url, callback=self.parse_record_rent_list
-                          , meta={'community_id': response.meta['community_id']})
+                          , meta={'community_id': response.meta['community_id']}, dont_filter=True)
 
     def record_sell_page_list(self, response):
         soup = BeautifulSoup(response.body, 'html5lib')
@@ -198,7 +201,7 @@ class RecordSpider(scrapy.Spider):
         for i in range(1, max_page+1):
             url = response.meta['base_url']+'-p1'+str(i)+'-t11/'
             yield Request(url, callback=self.parse_record_sell_list
-                          , meta={'community_id': response.meta['community_id']})
+                          , meta={'community_id': response.meta['community_id']}, dont_filter=True)
 
     def parse_record_sell_list(self, response):
         soup = BeautifulSoup(response.body, 'html5lib')
@@ -207,12 +210,65 @@ class RecordSpider(scrapy.Spider):
         if tr_list[0].find('th') != None:
             del tr_list[0]
         for tr_item in tr_list:
+            record_sell_item = RecordSellItem()
+            record_sell_item['community_id'] = response.meta['community_id']
+            td_first = tr_item.find('div', attrs={'class': 'hspro'}).contents
+            td_first_str = []
+            for td_first_item in td_first:
+                if isinstance(td_first_item, NavigableString):
+                    continue
+                td_first_str.append(''.join(td_first_item.get_text().split()))
+            for first_str in td_first_str:
+                if re.search('[东|南|西|北]+', first_str) != None:
+                    record_sell_item['direction'] = first_str
+                elif first_str.find('层') != -1:
+                    record_sell_item['floor'] = first_str
+                elif re.search('[0-9]+室', first_str) != None:
+                    record_sell_item['house_model'] = first_str
             td_list = tr_item.find_all('td')
-
-        pass
+            if td_list[0]['class'].count('firsttd') != 0:
+                del td_list[0]
+            for td_item in td_list:
+                item_str = td_item.get_text()
+                item_str = ''.join(item_str.split())
+                if re.search('[0-9|.]+�O', item_str) != None:
+                    record_sell_item['area_build'] = int(float(re.search('[0-9|.]+', item_str).group()))
+                elif re.search('[0-9]+-[0-9]+-[0-9]+', item_str) != None:
+                    record_sell_item['sell_time'] = item_str
+                elif re.search('[0-9|.]+万', item_str) != None:
+                    record_sell_item['price_all'] = int(float(re.search('[0-9|.]+', item_str).group()))
+                elif re.search('[0-9|.]+元/', item_str) != None:
+                    record_sell_item['price_per'] = int(float(re.search('[0-9|.]+', item_str).group()))
+            yield record_sell_item
 
     def parse_record_rent_list(self, response):
-        pass
+        soup = BeautifulSoup(response.body, 'html5lib')
+        tr_list = soup.find('div', attrs={'class': 'tableWrap'})\
+            .find('div', attrs={'class': 'dealRent'}).find('tbody').find_all('tr')
+        del tr_list[0]
+        for tr_item in tr_list:
+            if ''.join(tr_item.get_text().split()) == '':
+                continue
+            else:
+                record_rent_item = RecordRentItem()
+                record_rent_item['community_id'] = response.meta['community_id']
+                td_list = tr_item.find_all('td')
+                for td_item in td_list:
+                    td_str = td_item.get_text()
+                    td_str = ''.join(td_str.split())
+                    if re.search('[0-9]+-[0-9]+-[0-9]+', td_str) != None:
+                        record_rent_item['sell_time'] = td_str
+                    elif re.search('[0-9]+元/月', td_str) != None:
+                        record_rent_item['price'] = int(re.search('[0-9]+', td_str).group())
+                    elif re.search('[0-9]+室', td_str) != None:
+                        record_rent_item['house_model'] = td_str
+                    elif re.search('[0-9|.]+�O', td_str) != None:
+                        record_rent_item['area_build'] = int(float(re.search('[0-9]+', td_str).group()))
+                    elif td_str.find('层') != -1:
+                        record_rent_item['floor'] = td_str
+                    elif re.search('[东|南|西|北]+', td_str) != None:
+                        record_rent_item['direction'] = td_str
+                yield record_rent_item
 
     def parse_pay_params(self, response):
         soup = BeautifulSoup(response.body, 'html5lib')

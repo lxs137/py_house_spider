@@ -1,6 +1,7 @@
 import mysql.connector
 from mysql.connector import errorcode
 from sf_record_spider import settings
+import time
 class MySQLConnectorSF(object):
     try:
         cnx = mysql.connector.connect(user=settings.MYSQL_USER,
@@ -16,6 +17,53 @@ class MySQLConnectorSF(object):
             print(error)
     else:
         cursor = cnx.cursor(buffered=True)
+        time_str = time.strftime('_%Y_%m_%d', time.localtime())
+
+    @classmethod
+    def create_tables(cls):
+        create_command = []
+        create_command.append('CREATE TABLE sell_info'+cls.time_str+'(sell_info_id int NOT NULL PRIMARY KEY AUTO_INCREMENT,'\
+                            'code varchar(50),release_time date, price_all int,price_per int,first_pay int,'\
+                            'month_pay int,floor varchar(50),area_build int,direction varchar(50),'\
+                            'decoration varchar(50),house_model varchar(50),build_time int,'\
+                            'house_structure varchar(50),house_type varchar(50),'\
+                            'property_type varchar(50))engine=innodb default charset=utf8')
+        create_command.append('CREATE TABLE relation_community_sell'+cls.time_str+'(sell_info_id int NOT NULL,'\
+                            'community_info_id int,foreign key(sell_info_id) references sell_info(sell_info_id) '\
+                            'on delete cascade on update cascade)engine=innodb default charset=utf8')
+        create_command.append('CREATE TABLE rent_info'+cls.time_str+'(rent_info_id int NOT NULL PRIMARY KEY AUTO_INCREMENT,'\
+                            'code varchar(50),update_time date,price int,rate float,pay_type varchar(50),'\
+                            'house_type varchar(50),house_model varchar(50),area_build int,floor varchar(50),'\
+                            'direction varchar(50),decoration varchar(50),support_bed BOOLEAN,'\
+                            'support_furniture BOOLEAN,support_gas BOOLEAN,support_warm BOOLEAN,'\
+                            'support_network BOOLEAN,support_tv BOOLEAN,support_condition BOOLEAN,'\
+                            'support_fridge BOOLEAN,support_wash BOOLEAN,support_water BOOLEAN)'\
+                            'engine=innodb default charset=utf8')
+        create_command.append('CREATE TABLE relation_community_rent'+cls.time_str+'(rent_info_id int NOT NULL,'\
+                            'community_info_id int,foreign key(rent_info_id) references rent_info(rent_info_id) '\
+                            'on delete cascade on update cascade)engine=innodb default charset=utf8')
+        create_command.append('CREATE TABLE record_sell_info'+cls.time_str+'(record_sell_info_id int NOT NULL PRIMARY KEY AUTO_INCREMENT,'\
+                            'house_model varchar(50),floor varchar(50),direction varchar(50),area_build int,'\
+                            'sell_time date,price_all int,price_per int)engine=innodb default charset=utf8')
+        create_command.append('CREATE TABLE relation_community_record_sell'+cls.time_str+'(record_sell_info_id int NOT NULL,'\
+                            'community_info_id int,foreign key(record_sell_info_id) '\
+                            'references record_sell_info(record_sell_info_id) on delete cascade on update cascade)'\
+                            'engine=innodb default charset=utf8')
+        create_command.append('CREATE TABLE record_rent_info'+cls.time_str+'(record_rent_info_id'\
+                            ' int NOT NULL PRIMARY KEY AUTO_INCREMENT,house_model varchar(50),'\
+                            'floor varchar(50),direction varchar(50),area_build int,sell_time date,price int)'\
+                            'engine=innodb default charset=utf8')
+        create_command.append('CREATE TABLE relation_community_record_rent'+cls.time_str+'(record_rent_info_id'\
+                            ' int NOT NULL,community_info_id int,foreign key(record_rent_info_id)'\
+                            ' references record_rent_info(record_rent_info_id) on delete cascade on update cascade)'\
+                            'engine=innodb default charset=utf8')
+        for sql_command in create_command:
+            try:
+                cls.cursor.execute(sql_command)
+            except mysql.connector.Error as err:
+                if err.errno == errorcode.ER_TABLE_EXISTS_ERROR:
+                    print('Table exist.')
+        cls.cnx.commit()
 
     @classmethod
     def close_connect(cls):
@@ -24,7 +72,7 @@ class MySQLConnectorSF(object):
 
     @classmethod
     def select_community_url(cls):
-        select_command = 'SELECT sell_url,rent_url,record_url,community_info_id FROM community_info LIMIT 0,20'
+        select_command = 'SELECT sell_url,rent_url,record_url,community_info_id FROM community_info'+cls.time_str
         cls.cursor.execute(select_command)
         return cls.cursor.fetchall()
         # return [('http://jinyutixiangwk025.fang.com/chushou/'
@@ -67,5 +115,35 @@ class MySQLConnectorSF(object):
         relation_dict['community_info_id'] = community_info_id
         cls.cursor.execute(insert_command, insert_dict)
         relation_dict['rent_info_id'] = cls.cursor.lastrowid
+        cls.cursor.execute(relation_command, relation_dict)
+        cls.cnx.commit()
+
+    @classmethod
+    def insert_record_sell_info(cls, insert_dict, community_info_id):
+        insert_command = 'INSERT INTO record_sell_info(house_model,floor,direction,'\
+                         'area_build,sell_time,price_all,price_per)'\
+                         'VALUES(%(house_model)s,%(floor)s,%(direction)s,%(area_build)s,'\
+                         '%(sell_time)s,%(price_all)s,%(price_per)s)'
+        relation_command = 'INSERT INTO relation_community_record_sell(record_sell_info_id,community_info_id)'\
+                           'VALUES(%(record_sell_info_id)s,%(community_info_id)s)'
+        relation_dict = {}
+        relation_dict['community_info_id'] = community_info_id
+        cls.cursor.execute(insert_command, insert_dict)
+        relation_dict['record_sell_info_id'] = cls.cursor.lastrowid
+        cls.cursor.execute(relation_command, relation_dict)
+        cls.cnx.commit()
+
+    @classmethod
+    def insert_record_rent_info(cls, insert_dict, community_info_id):
+        insert_command = 'INSERT INTO record_rent_info(house_model,floor,direction,'\
+                         'area_build,sell_time,price)'\
+                         'VALUES(%(house_model)s,%(floor)s,%(direction)s,%(area_build)s,'\
+                         '%(sell_time)s,%(price)s)'
+        relation_command = 'INSERT INTO relation_community_record_rent(record_rent_info_id,community_info_id)'\
+                           'VALUES(%(record_rent_info_id)s,%(community_info_id)s)'
+        relation_dict = {}
+        relation_dict['community_info_id'] = community_info_id
+        cls.cursor.execute(insert_command, insert_dict)
+        relation_dict['record_rent_info_id'] = cls.cursor.lastrowid
         cls.cursor.execute(relation_command, relation_dict)
         cls.cnx.commit()
