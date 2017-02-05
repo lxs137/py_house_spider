@@ -23,17 +23,17 @@ class MySQLConnectorSF(object):
     @classmethod
     def create_table(cls):
         create_command = 'CREATE TABLE community_info'+cls.time_str+'(community_info_id'\
-                         ' int NOT NULL PRIMARY KEY AUTO_INCREMENT,name varchar(100),'\
+                         ' int NOT NULL PRIMARY KEY AUTO_INCREMENT,code varchar(100),name varchar(100),'\
                          'page_url varchar(255),sell_url varchar(255),rent_url varchar(255),'\
                          'record_url varchar(255),price_cur int,ratio_month float,'\
                          'address varchar(255),community_feature varchar(100),'\
                          'region varchar(100),property varchar(100),manage_type varchar(100),'\
                          'done_time date,build_company varchar(100),building_type varchar(100),'\
                          'building_area int,cover_area int,house_num_cur smallint,house_num_sum smallint,'\
-                         'green_rate float,volum_rate float,manage_price float,info_add varchar(100),'\
+                         'green_rate float,volum_rate float,construction_rate float,manage_price float,info_add varchar(100),'\
                          'water_price varchar(50),electric_price varchar(50),gas_price varchar(50),'\
                          'network varchar(50),elector varchar(50),security varchar(50),sanitation varchar(50),'\
-                         'parking varchar(50),metro varchar(50),bus varchar(50),car varchar(50),'\
+                         'parking varchar(100),metro varchar(50),bus varchar(50),car varchar(50),'\
                          'kindergarten varchar(50),school varchar(50),university varchar(50),shop_mall varchar(50),'\
                          'hospital varchar(50),post_office varchar(50),bank varchar(50),other_facility varchar(50))'\
                          'engine=innodb default charset=utf8'
@@ -52,20 +52,20 @@ class MySQLConnectorSF(object):
     @classmethod
     def insert_community_info(cls, info_dict):
         insert_command = 'INSERT INTO community_info'+cls.time_str+'( \
-                         name,page_url,sell_url,rent_url,record_url,price_cur,ratio_month,address, \
+                         code,name,page_url,sell_url,rent_url,record_url,price_cur,ratio_month,address, \
                          community_feature,region,property,manage_type,done_time, \
                          build_company,building_type,building_area,cover_area, \
-                         house_num_cur,house_num_sum,green_rate,volum_rate, \
+                         house_num_cur,house_num_sum,green_rate,volum_rate,construction_rate, \
                          manage_price,info_add,water_price,electric_price,gas_price, \
                          network,elector,security,sanitation,parking,metro,bus,car, \
                          kindergarten,school,university,shop_mall,hospital,post_office, \
                          bank,other_facility)\
-                         VALUES (%(name)s, %(page_url)s, %(sell_url)s, %(rent_url)s, %(record_url)s, %(price_cur)s, %(ratio_month)s,\
+                         VALUES (%(code)s, %(name)s, %(page_url)s, %(sell_url)s, %(rent_url)s, %(record_url)s, %(price_cur)s, %(ratio_month)s,\
                          %(address)s, %(community_feature)s, %(region)s, %(property)s,\
                          %(manage_type)s, %(done_time)s, %(build_company)s,\
                          %(building_type)s, %(building_area)s, %(cover_area)s,\
                          %(house_num_cur)s, %(house_num_sum)s, %(green_rate)s,\
-                         %(volum_rate)s, %(manage_price)s, %(info_add)s, %(water_price)s,\
+                         %(volum_rate)s, %(construction_rate)s, %(manage_price)s, %(info_add)s, %(water_price)s,\
                          %(electric_price)s, %(gas_price)s, %(network)s, %(elector)s,\
                          %(security)s, %(sanitation)s, %(parking)s, %(metro)s, %(bus)s,\
                          %(car)s, %(kindergarten)s, %(school)s, %(university)s,\

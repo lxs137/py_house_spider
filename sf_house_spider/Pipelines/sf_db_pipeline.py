@@ -8,6 +8,8 @@ class SFDataBasePipeline(object):
     def process_item(self, item, spider):
         if isinstance(item, CommunityItem):
             info_dict = {}
+            url = item['page_url']
+            info_dict['code'] = 'sf_'+url[url.find('http://')+7:url.find('.fang')]
             info_dict['name'] = item['name']
             info_dict['region'] = item['region']
             info_dict['page_url'] = item['page_url']
@@ -34,6 +36,7 @@ class SFDataBasePipeline(object):
             info_dict['house_num_sum'] = self.parse_number(item['house_num_sum'], False)
             info_dict['green_rate'] = self.parse_number(item['green_rate'], True)
             info_dict['volum_rate'] = self.parse_number(item['volum_rate'], True)
+            info_dict['construction_rate'] = None
             info_dict['manage_price'] = self.parse_number(item['manage_price'], True)
             info_dict['info_add'] = item['info_add']
             info_dict['water_price'] = item['water_price']
@@ -60,7 +63,7 @@ class SFDataBasePipeline(object):
 
     def parse_number(self, str, returnFloat):
         if str:
-            match_object = re.match('[0-9|\.|-]+', str)
+            match_object = re.search('[0-9|\.|-]+', str)
             if match_object:
                 if returnFloat:
                     return float(match_object.group())
