@@ -11,7 +11,6 @@ class ProxyMiddleware(object):
                    'Upgrade-Insecure-Requests': '1',
                    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-                   # 'Referer': 'http://www.kuaidaili.com/free/inha/',
                    'Accept-Encoding': 'gzip, deflate, sdch',
                    'Accept-Language': 'zh-CN,zh;q=0.8',
                    'Cookie': '_gat=1; channelid=0; sid=1486127313219185; _ga=GA1.2.290594692.1486128379; Hm_lvt_7ed65b1cc4b810e9fd37959c9bb51b31=1486128379; Hm_lpvt_7ed65b1cc4b810e9fd37959c9bb51b31=1486128414'}
