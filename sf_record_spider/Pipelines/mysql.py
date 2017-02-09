@@ -63,7 +63,8 @@ class MySQLConnectorSF(object):
             except mysql.connector.Error as err:
                 if err.errno == errorcode.ER_TABLE_EXISTS_ERROR:
                     print('Table exist.')
-        cls.cnx.commit()
+            finally:
+                cls.cnx.commit()
 
     @classmethod
     def close_connect(cls):
@@ -82,13 +83,13 @@ class MySQLConnectorSF(object):
 
     @classmethod
     def insert_sell_info(cls, insert_dict, community_info_id):
-        insert_command = 'INSERT INTO sell_info(code,release_time,price_all,'\
+        insert_command = 'INSERT INTO sell_info'+cls.time_str+'(code,release_time,price_all,'\
                          'price_per,first_pay,month_pay,floor,area_build,direction,'\
                          'decoration,house_model,build_time,house_structure,house_type,property_type)'\
                          'VALUES(%(code)s,%(release_time)s,%(price_all)s,%(price_per)s,%(first_pay)s,'\
                          '%(month_pay)s,%(floor)s,%(area_build)s,%(direction)s,%(decoration)s,%(house_model)s,'\
                          '%(build_time)s,%(house_structure)s,%(house_type)s,%(property_type)s)'
-        relation_command = 'INSERT INTO relation_community_sell(sell_info_id,community_info_id)'\
+        relation_command = 'INSERT INTO relation_community_sell'+cls.time_str+'(sell_info_id,community_info_id)'\
                            'VALUES(%(sell_info_id)s,%(community_info_id)s)'
         relation_dict = {}
         relation_dict['community_info_id'] = community_info_id
@@ -99,7 +100,7 @@ class MySQLConnectorSF(object):
 
     @classmethod
     def insert_rent_info(cls, insert_dict, community_info_id):
-        insert_command = 'INSERT INTO rent_info(code,update_time,price,'\
+        insert_command = 'INSERT INTO rent_info'+cls.time_str+'(code,update_time,price,'\
                          'rate,pay_type,house_type,house_model,area_build,floor,'\
                          'direction,decoration,support_bed,support_furniture,'\
                          'support_gas,support_warm,support_network,support_tv,'\
@@ -109,7 +110,7 @@ class MySQLConnectorSF(object):
                          '%(direction)s,%(decoration)s,%(support_bed)s,%(support_furniture)s,'\
                          '%(support_gas)s,%(support_warm)s,%(support_network)s,%(support_tv)s,'\
                          '%(support_condition)s,%(support_fridge)s,%(support_wash)s,%(support_water)s)'
-        relation_command = 'INSERT INTO relation_community_rent(rent_info_id,community_info_id)'\
+        relation_command = 'INSERT INTO relation_community_rent'+cls.time_str+'(rent_info_id,community_info_id)'\
                            'VALUES(%(rent_info_id)s,%(community_info_id)s)'
         relation_dict = {}
         relation_dict['community_info_id'] = community_info_id
@@ -120,11 +121,11 @@ class MySQLConnectorSF(object):
 
     @classmethod
     def insert_record_sell_info(cls, insert_dict, community_info_id):
-        insert_command = 'INSERT INTO record_sell_info(house_model,floor,direction,'\
+        insert_command = 'INSERT INTO record_sell_info'+cls.time_str+'(house_model,floor,direction,'\
                          'area_build,sell_time,price_all,price_per)'\
                          'VALUES(%(house_model)s,%(floor)s,%(direction)s,%(area_build)s,'\
                          '%(sell_time)s,%(price_all)s,%(price_per)s)'
-        relation_command = 'INSERT INTO relation_community_record_sell(record_sell_info_id,community_info_id)'\
+        relation_command = 'INSERT INTO relation_community_record_sell'+cls.time_str+'(record_sell_info_id,community_info_id)'\
                            'VALUES(%(record_sell_info_id)s,%(community_info_id)s)'
         relation_dict = {}
         relation_dict['community_info_id'] = community_info_id
@@ -135,11 +136,11 @@ class MySQLConnectorSF(object):
 
     @classmethod
     def insert_record_rent_info(cls, insert_dict, community_info_id):
-        insert_command = 'INSERT INTO record_rent_info(house_model,floor,direction,'\
+        insert_command = 'INSERT INTO record_rent_info'+cls.time_str+'(house_model,floor,direction,'\
                          'area_build,sell_time,price)'\
                          'VALUES(%(house_model)s,%(floor)s,%(direction)s,%(area_build)s,'\
                          '%(sell_time)s,%(price)s)'
-        relation_command = 'INSERT INTO relation_community_record_rent(record_rent_info_id,community_info_id)'\
+        relation_command = 'INSERT INTO relation_community_record_rent'+cls.time_str+'(record_rent_info_id,community_info_id)'\
                            'VALUES(%(record_rent_info_id)s,%(community_info_id)s)'
         relation_dict = {}
         relation_dict['community_info_id'] = community_info_id
