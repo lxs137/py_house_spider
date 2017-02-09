@@ -29,7 +29,7 @@ class MySQLConnectorSF(object):
                             'house_structure varchar(50),house_type varchar(50),'\
                             'property_type varchar(50))engine=innodb default charset=utf8')
         create_command.append('CREATE TABLE relation_community_sell'+cls.time_str+'(sell_info_id int NOT NULL,'\
-                            'community_info_id int,foreign key(sell_info_id) references sell_info(sell_info_id) '\
+                            'community_info_id int,foreign key(sell_info_id) references sell_info'+cls.time_str+'(sell_info_id) '\
                             'on delete cascade on update cascade)engine=innodb default charset=utf8')
         create_command.append('CREATE TABLE rent_info'+cls.time_str+'(rent_info_id int NOT NULL PRIMARY KEY AUTO_INCREMENT,'\
                             'code varchar(50),update_time date,price int,rate float,pay_type varchar(50),'\
@@ -40,14 +40,14 @@ class MySQLConnectorSF(object):
                             'support_fridge BOOLEAN,support_wash BOOLEAN,support_water BOOLEAN)'\
                             'engine=innodb default charset=utf8')
         create_command.append('CREATE TABLE relation_community_rent'+cls.time_str+'(rent_info_id int NOT NULL,'\
-                            'community_info_id int,foreign key(rent_info_id) references rent_info(rent_info_id) '\
+                            'community_info_id int,foreign key(rent_info_id) references rent_info'+cls.time_str+'(rent_info_id) '\
                             'on delete cascade on update cascade)engine=innodb default charset=utf8')
         create_command.append('CREATE TABLE record_sell_info'+cls.time_str+'(record_sell_info_id int NOT NULL PRIMARY KEY AUTO_INCREMENT,'\
                             'house_model varchar(50),floor varchar(50),direction varchar(50),area_build int,'\
                             'sell_time date,price_all int,price_per int)engine=innodb default charset=utf8')
         create_command.append('CREATE TABLE relation_community_record_sell'+cls.time_str+'(record_sell_info_id int NOT NULL,'\
                             'community_info_id int,foreign key(record_sell_info_id) '\
-                            'references record_sell_info(record_sell_info_id) on delete cascade on update cascade)'\
+                            'references record_sell_info'+cls.time_str+'(record_sell_info_id) on delete cascade on update cascade)'\
                             'engine=innodb default charset=utf8')
         create_command.append('CREATE TABLE record_rent_info'+cls.time_str+'(record_rent_info_id'\
                             ' int NOT NULL PRIMARY KEY AUTO_INCREMENT,house_model varchar(50),'\
@@ -55,7 +55,7 @@ class MySQLConnectorSF(object):
                             'engine=innodb default charset=utf8')
         create_command.append('CREATE TABLE relation_community_record_rent'+cls.time_str+'(record_rent_info_id'\
                             ' int NOT NULL,community_info_id int,foreign key(record_rent_info_id)'\
-                            ' references record_rent_info(record_rent_info_id) on delete cascade on update cascade)'\
+                            ' references record_rent_info'+cls.time_str+'(record_rent_info_id) on delete cascade on update cascade)'\
                             'engine=innodb default charset=utf8')
         for sql_command in create_command:
             try:
