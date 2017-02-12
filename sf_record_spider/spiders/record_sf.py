@@ -1,6 +1,6 @@
 import scrapy
 from scrapy.http import Request
-from bs4 import BeautifulSoup,NavigableString
+from bs4 import BeautifulSoup, NavigableString
 import re
 from sf_record_spider.Pipelines.mysql import MySQLConnectorSF
 from sf_record_spider.items import SellItem, RentItem, RecordSellItem, RecordRentItem

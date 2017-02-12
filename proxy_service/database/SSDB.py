@@ -1,46 +1,42 @@
 from proxy_service.database.ssdb_helper import Client
+
+
 class SSDBManager(object):
-    try:
-        c = Client(host='127.0.0.1', port=8888)
-    except:
-        print('SSDB connect error.')
+    def __init__(self, host='127.0.0.1', port=8888):
+        try:
+            self.c = Client(host=host, port=port)
+        except:
+            print('SSDB connect error.')
 
-    @classmethod
-    def create_list(cls, name, li):
-        cls.c.qclear(name)
-        for item in li:
-            cls.c.qpush(item)
+    def create_list(self, name, list_data):
+        self.c.qclear(name)
+        for item in list_data:
+            self.c.qpush(item)
 
-    @classmethod
-    def insert_list_item(cls, name, item):
-        cls.c.qpush_front(name, item)
+    def clear_list(self, name):
+        self.c.qclear(name)
 
-    @classmethod
-    def get_list(cls, name):
-        size = cls.c.qsize(name)
-        li = cls.c.qrange(name, 0, size)
+    def insert_list_item(self, name, item):
+        self.c.qpush_front(name, item)
+
+    def get_list(self, name):
+        size = self.c.qsize(name)
+        li = self.c.qrange(name, 0, size)
         return li
 
-    @classmethod
-    def get_list_front(cls, name):
-        if cls.c.qfront(name) != None:
-            item = cls.c.qpop_front(name)
-            cls.c.qpush_back(name, item)
+    def get_list_front(self, name):
+        if self.c.qfront(name) != None:
+            item = self.c.qpop_front(name)
+            self.c.qpush_back(name, item)
             return item
         else:
             return None
 
-    @classmethod
-    def insert_test(cls):
-        print('insert')
-
-    @classmethod
-    def close_connect(cls):
-        cls.c.disconnect()
+    def close_connect(self):
+        self.c.disconnect()
 
 
 if __name__ == '__main__':
     c = Client(host='127.0.0.1', port=8888)
-    li = c.qfront('li_test')
-    str = str(li)
-    print(str)
+    c.qclear('no_list')
+    print('clear')
