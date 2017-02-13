@@ -11,7 +11,7 @@ class SSDBManager(object):
     def create_list(self, name, list_data):
         self.c.qclear(name)
         for item in list_data:
-            self.c.qpush(item)
+            self.c.qpush(name, item)
 
     def clear_list(self, name):
         self.c.qclear(name)
@@ -21,14 +21,18 @@ class SSDBManager(object):
 
     def get_list(self, name):
         size = self.c.qsize(name)
-        li = self.c.qrange(name, 0, size)
-        return li
+        li_bytes = self.c.qrange(name, 0, size)
+        li_str = []
+        for li_item in li_bytes:
+            # type(li_item) = bytes
+            li_str.append(li_item.decode())
+        return li_str
 
     def get_list_front(self, name):
         if self.c.qfront(name) != None:
             item = self.c.qpop_front(name)
             self.c.qpush_back(name, item)
-            return item
+            return item.decode()
         else:
             return None
 
