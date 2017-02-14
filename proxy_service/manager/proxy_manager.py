@@ -20,24 +20,29 @@ class ProxyManager(object):
         else:
             return proxy_list
 
-    def insert_unchecked_proxy(self, proxy_list):
-        all_list = self.db_conn.get_list(ProxyManager.all_list)
+    def insert_proxy_list(self, name, proxy_list):
+        all_list = self.db_conn.get_list(name)
         if all_list == None or len(all_list) == 0:
             all_list = proxy_list
         else:
             for proxy in proxy_list:
                 if all_list.count(proxy) == 0:
                     all_list.append(proxy)
-        self.db_conn.create_list(ProxyManager.all_list, all_list)
+        self.db_conn.create_list(name, all_list)
 
     def get_unchecked_proxy(self):
         unchecked_list = []
         extend_list = []
         extend_list.append(ProxySpider.get_haoip())
+        print('haoip done:', extend_list[len(extend_list)-1])
         extend_list.append(ProxySpider.get_kuaidaili())
+        print('kuaidaili done:', extend_list[len(extend_list) - 1])
         extend_list.append(ProxySpider.get_66daili())
+        print('66daili done:', extend_list[len(extend_list) - 1])
         extend_list.append(ProxySpider.get_youdaili())
+        print('youdaili done:', extend_list[len(extend_list) - 1])
         extend_list.append(ProxySpider.get_xicidaili())
+        print('xicidaili done:', extend_list[len(extend_list) - 1])
         for list_item in extend_list:
             if list_item != None:
                 unchecked_list.extend(list_item)
@@ -51,7 +56,7 @@ class ProxyManager(object):
         for proxy in all_list:
             if ProxySpider.check_valid(proxy) and ProxySpider.check_anonymous(proxy):
                 valid_proxy.append(proxy)
-        self.db_conn.create_list(ProxyManager.valid_list, valid_proxy)
+        return valid_proxy
 
     def clear_list(self, name):
         self.db_conn.clear_list(name)

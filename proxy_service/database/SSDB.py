@@ -9,9 +9,10 @@ class SSDBManager(object):
             print('SSDB connect error.')
 
     def create_list(self, name, list_data):
-        self.c.qclear(name)
+        list_size = self.c.qsize(name)
         for item in list_data:
             self.c.qpush(name, item)
+        self.c.qpop(name, list_size)
 
     def clear_list(self, name):
         self.c.qclear(name)
@@ -38,6 +39,9 @@ class SSDBManager(object):
 
     def close_connect(self):
         self.c.disconnect()
+
+    def __del__(self):
+        self.close_connect()
 
 
 if __name__ == '__main__':

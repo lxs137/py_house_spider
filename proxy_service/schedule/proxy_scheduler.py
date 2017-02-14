@@ -15,8 +15,9 @@ class ProxyScheduler(object):
         print('Refresh proxy pool: start.')
         print(datetime.datetime.now())
         unchecked_list = self.manager.get_unchecked_proxy()
-        self.manager.insert_unchecked_proxy(unchecked_list)
-        self.manager.check_proxies()
+        self.manager.insert_proxy_list(ProxyManager.all_list, unchecked_list)
+        valid_list = self.manager.check_proxies()
+        self.manager.insert_proxy_list(ProxyManager.valid_list, valid_list)
         print('Refresh proxy pool: done.')
 
     def clear_proxy_pool(self):
@@ -24,7 +25,7 @@ class ProxyScheduler(object):
         print(datetime.datetime.now())
         self.manager.clear_list(ProxyManager.all_list)
         overdue_list = self.manager.get_all_proxies()
-        self.manager.insert_unchecked_proxy(overdue_list)
+        self.manager.insert_proxy_list(ProxyManager.all_list, overdue_list)
         self.manager.clear_list(ProxyManager.valid_list)
         print('Clear proxy pool: done.')
 
