@@ -9,7 +9,6 @@ from bs4 import BeautifulSoup, NavigableString
 class ProxySpider(object):
     user_agent_list = [
         "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/22.0.1207.1 Safari/537.1",
-        "Mozilla/5.0 (X11; CrOS i686 2268.111.0) AppleWebKit/536.11 (KHTML, like Gecko) Chrome/20.0.1132.57 Safari/536.11",
         "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.6 (KHTML, like Gecko) Chrome/20.0.1092.0 Safari/536.6",
         "Mozilla/5.0 (Windows NT 6.2) AppleWebKit/536.6 (KHTML, like Gecko) Chrome/20.0.1090.0 Safari/536.6",
         "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/19.77.34.5 Safari/537.1",
@@ -17,7 +16,6 @@ class ProxySpider(object):
         "Mozilla/5.0 (Windows NT 6.0) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.36 Safari/536.5",
         "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1063.0 Safari/536.3",
         "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1063.0 Safari/536.3",
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_0) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1063.0 Safari/536.3",
         "Mozilla/5.0 (Windows NT 6.2) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1062.0 Safari/536.3",
         "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1062.0 Safari/536.3",
         "Mozilla/5.0 (Windows NT 6.2) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1061.1 Safari/536.3",
@@ -47,10 +45,18 @@ class ProxySpider(object):
     def get_kuaidaili(cls):
         # http://www.kuaidaili.com/
         ipList = []
-        headers = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36'}
+        m_headers = {'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                     'Accept-Encoding': 'gzip, deflate, sdch',
+                     'Accept-Language': 'zh-CN,zh;q=0.8',
+                     'Cache-Control': 'max-age=0',
+                     'Connection': 'keep-alive',
+                     'Host': 'www.kuaidaili.com',
+                     'Referer': 'http://www.kuaidaili.com/pricing/',
+                     'Upgrade-Insecure-Requests': '1',
+                     'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36'}
         for i in range(1, 11):
             url = 'http://www.kuaidaili.com/proxylist/'+str(i)+'/'
-            html = cls.requests_get(url, headers=headers)
+            html = cls.requests_get(url, headers=m_headers)
             if html == None:
                 continue
             soup = BeautifulSoup(html.text, 'lxml')
@@ -100,10 +106,9 @@ class ProxySpider(object):
 
     @classmethod
     @robust_crawl
-    def get_66daili(cls, proxy_num=50):
+    def get_66daili(cls):
         # http://www.66ip.cn/
-        response = cls.requests_get('http://www.66ip.cn/nmtq.php?getnum=%d&isp=0&anonymoustype=2\
-        &start=&ports=&export=&ipaddress=&area=1&proxytype=0&api=66ip' % proxy_num)
+        response = cls.requests_get('http://www.66ip.cn/nmtq.php?getnum=50&isp=0&anonymoustype=2&start=&ports=&export=&ipaddress=&area=1&proxytype=0&api=66ip')
         if response==None:
             return None
         else:
@@ -121,7 +126,7 @@ class ProxySpider(object):
         if response == None:
             return None
         soup = BeautifulSoup(response.text, 'lxml')
-        tr_list = soup.find('table', attrs={'id': 'ip_list'}).find('tbody').find_all('tr')
+        tr_list = soup.find('table', attrs={'id': 'ip_list'}).find_all('tr')
         ipList = []
         for tr_item in tr_list:
             td_list = tr_item.find_all('td')

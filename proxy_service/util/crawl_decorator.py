@@ -16,3 +16,15 @@ def robust_check(func):
             print('发生错误:', e)
             return False
     return decorate
+
+def my_log(func):
+    import sys
+    def decorate(*args, **kwargs):
+        console_stdout = sys.stdout
+        f_log = open('output.log', 'a+')
+        sys.stdout = f_log
+        func_return = func(*args, **kwargs)
+        sys.stdout = console_stdout
+        f_log.close()
+        return func_return
+    return decorate

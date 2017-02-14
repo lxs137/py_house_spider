@@ -1,7 +1,12 @@
 from proxy_service.manager.proxy_manager import ProxyManager
 from apscheduler.schedulers.blocking import BlockingScheduler
+from proxy_service.util.crawl_decorator import my_log
 import datetime
+
+
 class ProxyScheduler(object):
+
+    @my_log
     def __init__(self):
         self.manager = ProxyManager()
         self.scheduler = BlockingScheduler()
@@ -11,6 +16,7 @@ class ProxyScheduler(object):
         self.scheduler.add_job(self.refresh_proxy_pool, 'interval', hours=12, next_run_time=refresh_run_time)
         self.scheduler.add_job(self.clear_proxy_pool, 'interval', hours=48, next_run_time=clear_run_time)
 
+    @my_log
     def refresh_proxy_pool(self):
         print('Refresh proxy pool: start.')
         print(datetime.datetime.now())
@@ -20,6 +26,7 @@ class ProxyScheduler(object):
         self.manager.insert_proxy_list(ProxyManager.valid_list, valid_list)
         print('Refresh proxy pool: done.')
 
+    @my_log
     def clear_proxy_pool(self):
         print('Clear proxy pool: start.')
         print(datetime.datetime.now())
@@ -29,9 +36,11 @@ class ProxyScheduler(object):
         self.manager.clear_list(ProxyManager.valid_list)
         print('Clear proxy pool: done.')
 
+    @my_log
     def start_scheduler(self):
         self.scheduler.start()
 
+    @my_log
     def __del__(self):
         self.scheduler.remove_all_jobs()
         print('ProxyScheduler: remove all jobs.')
