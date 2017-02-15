@@ -1,5 +1,6 @@
 from proxy_service.database.SSDB import SSDBManager
 from proxy_service.crawl.proxy_spider import ProxySpider
+from proxy_service.util.crawl_decorator import my_log
 
 
 class ProxyManager(object):
@@ -48,6 +49,7 @@ class ProxyManager(object):
                 unchecked_list.extend(list_item)
         return unchecked_list
 
+    @my_log
     def check_proxies(self):
         all_list = self.db_conn.get_list(ProxyManager.all_list)
         valid_proxy = []

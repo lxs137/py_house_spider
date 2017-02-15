@@ -95,7 +95,7 @@ ITEM_PIPELINES = {
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
 # log信息设置
-LOG_FILE = '/home/lxs/scrapy_log'
+LOG_FILE = '/home/lxs/scrapy_record.log'
 LOG_LEVEL = 'INFO'
 
 # 内存占用监控
@@ -114,3 +114,7 @@ MYSQL_USER = 'root'
 MYSQL_PASSWORD = '1q2w3e4r'
 MYSQL_PORT = '3306'
 MYSQL_DB_SF = 'house_sf'
+
+PROXY_SERVICE_ADDRESS = 'http://123.206.225.94:5000/'
+PROXY_MAX_USE = '20'
+DEFAULT_PROXY = '222.33.192.238:8118'

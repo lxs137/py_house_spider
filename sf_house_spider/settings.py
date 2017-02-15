@@ -93,10 +93,18 @@ ITEM_PIPELINES = {
 # HTTPCACHE_IGNORE_HTTP_CODES = []
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
+LOG_FILE = '/home/lxs/scrapy_community.log'
 LOG_LEVEL = 'INFO'
+
+# Twisted线程池同时允许的线程数量
+REACTOR_THREADPOOL_MAXSIZE = 20
 
 MYSQL_HOSTS = '127.0.0.1'
 MYSQL_USER = 'root'
 MYSQL_PASSWORD = '1q2w3e4r'
 MYSQL_PORT = '3306'
 MYSQL_DB_SF = 'house_sf'
+
+PROXY_SERVICE_ADDRESS = 'http://123.206.225.94:5000/'
+PROXY_MAX_USE = '20'
+DEFAULT_PROXY = '222.33.192.238:8118'

@@ -14,12 +14,12 @@ def get_service_list():
     return jsonify(service_info)
 
 
-@app.route('/get', methods=['GET'])
+@app.route('/get/', methods=['GET'])
 def get_proxy():
     return ProxyManager().get_proxy()
 
 
-@app.route('/get_all', methods=['GET'])
+@app.route('/get_all/', methods=['GET'])
 def get_all_proxies():
     proxy_list = ProxyManager().get_all_proxies()
     if proxy_list == None:
@@ -27,7 +27,7 @@ def get_all_proxies():
     return jsonify(data=proxy_list)
 
 
-@app.route('/refresh')
+@app.route('/refresh/')
 def refresh_proxy_pool():
     ProxyManager().check_proxies()
     return 'Refresh proxy pool'

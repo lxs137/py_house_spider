@@ -20,11 +20,14 @@ def robust_check(func):
 def my_log(func):
     import sys
     def decorate(*args, **kwargs):
-        console_stdout = sys.stdout
-        f_log = open('output.log', 'a+')
-        sys.stdout = f_log
-        func_return = func(*args, **kwargs)
-        sys.stdout = console_stdout
-        f_log.close()
-        return func_return
+        if sys.stdout.name == '<stdout>':
+            console_stdout = sys.stdout
+            f_log = open('output.log', 'a+')
+            sys.stdout = f_log
+            func_return = func(*args, **kwargs)
+            sys.stdout = console_stdout
+            f_log.close()
+            return func_return
+        else:
+            return func(*args, **kwargs)
     return decorate
