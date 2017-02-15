@@ -2,6 +2,7 @@ from proxy_service.manager.proxy_manager import ProxyManager
 from apscheduler.schedulers.blocking import BlockingScheduler
 from proxy_service.util.crawl_decorator import my_log
 import datetime
+import threading
 
 
 class ProxyScheduler(object):
@@ -10,6 +11,7 @@ class ProxyScheduler(object):
     def __init__(self):
         self.manager = ProxyManager()
         self.scheduler = BlockingScheduler()
+        self.lock = threading.Lock()
         refresh_run_time = datetime.datetime.now()+datetime.timedelta(minutes=1)
         clear_run_time = datetime.datetime.now()+datetime.timedelta(hours=36)
         # 每隔12个小时刷新一次代理池，每隔48小时清空可用代理并重新验证
@@ -18,6 +20,7 @@ class ProxyScheduler(object):
 
     @my_log
     def refresh_proxy_pool(self):
+        self.lock.acquire()
         print('Refresh proxy pool: start.')
         print(datetime.datetime.now())
         unchecked_list = self.manager.get_unchecked_proxy()
@@ -25,9 +28,11 @@ class ProxyScheduler(object):
         valid_list = self.manager.check_proxies()
         self.manager.insert_proxy_list(ProxyManager.valid_list, valid_list)
         print('Refresh proxy pool: done.')
+        self.lock.release()
 
     @my_log
     def clear_proxy_pool(self):
+        self.lock.acquire()
         print('Clear proxy pool: start.')
         print(datetime.datetime.now())
         self.manager.clear_list(ProxyManager.all_list)
@@ -35,6 +40,7 @@ class ProxyScheduler(object):
         self.manager.insert_proxy_list(ProxyManager.all_list, overdue_list)
         self.manager.clear_list(ProxyManager.valid_list)
         print('Clear proxy pool: done.')
+        self.lock.release()
 
     @my_log
     def start_scheduler(self):
