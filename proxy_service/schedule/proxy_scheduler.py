@@ -3,11 +3,12 @@ from apscheduler.schedulers.blocking import BlockingScheduler
 from proxy_service.util.crawl_decorator import my_log
 import datetime
 import threading
+import os
 
 
 class ProxyScheduler(object):
 
-    @my_log
+    @my_log(log_name='schedule.log')
     def __init__(self):
         self.manager = ProxyManager()
         self.scheduler = BlockingScheduler()
@@ -18,7 +19,7 @@ class ProxyScheduler(object):
         self.scheduler.add_job(self.refresh_proxy_pool, 'interval', hours=12, next_run_time=refresh_run_time)
         self.scheduler.add_job(self.clear_proxy_pool, 'interval', hours=48, next_run_time=clear_run_time)
 
-    @my_log
+    @my_log(log_name='schedule.log')
     def refresh_proxy_pool(self):
         self.lock.acquire()
         print('Refresh proxy pool: start.')
@@ -30,7 +31,7 @@ class ProxyScheduler(object):
         print('Refresh proxy pool: done.')
         self.lock.release()
 
-    @my_log
+    @my_log(log_name='schedule.log')
     def clear_proxy_pool(self):
         self.lock.acquire()
         print('Clear proxy pool: start.')
@@ -42,15 +43,18 @@ class ProxyScheduler(object):
         print('Clear proxy pool: done.')
         self.lock.release()
 
-    @my_log
+    @my_log(log_name='schedule.log')
     def start_scheduler(self):
         self.scheduler.start()
 
-    @my_log
+    @my_log(log_name='schedule.log')
     def __del__(self):
         self.scheduler.remove_all_jobs()
         print('ProxyScheduler: remove all jobs.')
 
 if __name__ == '__main__':
+    f_pid = open('../proxy_service/schedule.pid', 'a')
+    f_pid.write('\npython: %d' % (os.getpid()))
+    f_pid.close()
     m_scheduler = ProxyScheduler()
     m_scheduler.start_scheduler()

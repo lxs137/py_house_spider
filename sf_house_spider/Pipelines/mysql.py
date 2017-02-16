@@ -35,7 +35,8 @@ class MySQLConnectorSF(object):
                          'network varchar(50),elector varchar(50),security varchar(50),sanitation varchar(50),'\
                          'parking varchar(100),metro varchar(50),bus varchar(50),car varchar(50),'\
                          'kindergarten varchar(50),school varchar(50),university varchar(50),shop_mall varchar(50),'\
-                         'hospital varchar(50),post_office varchar(50),bank varchar(50),other_facility varchar(50))'\
+                         'hospital varchar(50),post_office varchar(50),bank varchar(50),other_facility varchar(50),'\
+                         'property_company varchar(100),building_num_sum smallint)'\
                          'engine=innodb default charset=utf8'
         try:
             cls.cursor.execute(create_command)
@@ -59,7 +60,7 @@ class MySQLConnectorSF(object):
                          manage_price,info_add,water_price,electric_price,gas_price, \
                          network,elector,security,sanitation,parking,metro,bus,car, \
                          kindergarten,school,university,shop_mall,hospital,post_office, \
-                         bank,other_facility)\
+                         bank,other_facility,property_company,building_num_sum)\
                          VALUES (%(code)s, %(name)s, %(page_url)s, %(sell_url)s, %(rent_url)s, %(record_url)s, %(price_cur)s, %(ratio_month)s,\
                          %(address)s, %(community_feature)s, %(region)s, %(property)s,\
                          %(manage_type)s, %(done_time)s, %(build_company)s,\
@@ -70,7 +71,7 @@ class MySQLConnectorSF(object):
                          %(security)s, %(sanitation)s, %(parking)s, %(metro)s, %(bus)s,\
                          %(car)s, %(kindergarten)s, %(school)s, %(university)s,\
                          %(shop_mall)s, %(hospital)s, %(post_office)s, %(bank)s,\
-                         %(other_facility)s)'
+                         %(other_facility)s, %(property_company)s, %(building_num_sum)s)'
         cls.cursor.execute(insert_command, info_dict)
         cls.cnx.commit()
         pass

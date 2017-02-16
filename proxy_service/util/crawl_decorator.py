@@ -17,17 +17,23 @@ def robust_check(func):
             return False
     return decorate
 
-def my_log(func):
+
+def my_log(log_name):
     import sys
-    def decorate(*args, **kwargs):
-        if sys.stdout.name == '<stdout>':
-            console_stdout = sys.stdout
-            f_log = open('output.log', 'a+')
-            sys.stdout = f_log
-            func_return = func(*args, **kwargs)
-            sys.stdout = console_stdout
-            f_log.close()
-            return func_return
-        else:
-            return func(*args, **kwargs)
-    return decorate
+
+    def real_decorate(func):
+        def output_decorate(*args, **kwargs):
+            if sys.stdout.name == '<stdout>':
+                console_stdout = sys.stdout
+                f_log = open(log_name, 'a+')
+                sys.stdout = f_log
+                func_return = func(*args, **kwargs)
+                sys.stdout = console_stdout
+                f_log.close()
+                return func_return
+            else:
+                return func(*args, **kwargs)
+        return output_decorate
+    return real_decorate
+
+

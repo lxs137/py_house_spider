@@ -16,6 +16,8 @@ class SellItem(scrapy.Item):
     house_structure = scrapy.Field()
     house_type = scrapy.Field()
     property_type = scrapy.Field()
+    page_url = scrapy.Field()
+    building_type = scrapy.Field()
 
 class RentItem(scrapy.Item):
     community_id = scrapy.Field()
@@ -40,6 +42,8 @@ class RentItem(scrapy.Item):
     support_fridge = scrapy.Field()
     support_wash = scrapy.Field()
     support_water = scrapy.Field()
+    page_url = scrapy.Field()
+    rent_type = scrapy.Field()
 
 class RecordSellItem(scrapy.Item):
     community_id = scrapy.Field()

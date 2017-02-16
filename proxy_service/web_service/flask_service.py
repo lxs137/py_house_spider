@@ -1,5 +1,6 @@
 from flask import Flask, jsonify
 from proxy_service.manager.proxy_manager import ProxyManager
+from proxy_service.util.crawl_decorator import my_log
 
 app = Flask(__name__)
 service_info = {
@@ -11,11 +12,13 @@ service_info = {
 
 @app.route('/', methods=['GET'])
 def get_service_list():
+    print('index in')
     return jsonify(service_info)
 
 
 @app.route('/get/', methods=['GET'])
 def get_proxy():
+    print('get in')
     return ProxyManager().get_proxy()
 
 

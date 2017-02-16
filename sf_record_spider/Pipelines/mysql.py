@@ -27,7 +27,8 @@ class MySQLConnectorSF(object):
                             'month_pay int,floor varchar(50),area_build int,direction varchar(50),'\
                             'decoration varchar(50),house_model varchar(50),build_time int,'\
                             'house_structure varchar(50),house_type varchar(50),'\
-                            'property_type varchar(50))engine=innodb default charset=utf8')
+                            'property_type varchar(50),page_url varchar(255),last_deal_time date,'\
+                            'building_type varchar(100),crawl_time date)engine=innodb default charset=utf8')
         create_command.append('CREATE TABLE relation_community_sell'+cls.time_str+'(sell_info_id int NOT NULL,'\
                             'community_info_id int,foreign key(sell_info_id) references sell_info'+cls.time_str+'(sell_info_id) '\
                             'on delete cascade on update cascade)engine=innodb default charset=utf8')
@@ -37,7 +38,8 @@ class MySQLConnectorSF(object):
                             'direction varchar(50),decoration varchar(50),support_bed BOOLEAN,'\
                             'support_furniture BOOLEAN,support_gas BOOLEAN,support_warm BOOLEAN,'\
                             'support_network BOOLEAN,support_tv BOOLEAN,support_condition BOOLEAN,'\
-                            'support_fridge BOOLEAN,support_wash BOOLEAN,support_water BOOLEAN)'\
+                            'support_fridge BOOLEAN,support_wash BOOLEAN,support_water BOOLEAN,'\
+                            'page_url varchar(255),rent_type varchar(50),crawl_time date)'\
                             'engine=innodb default charset=utf8')
         create_command.append('CREATE TABLE relation_community_rent'+cls.time_str+'(rent_info_id int NOT NULL,'\
                             'community_info_id int,foreign key(rent_info_id) references rent_info'+cls.time_str+'(rent_info_id) '\
@@ -85,10 +87,12 @@ class MySQLConnectorSF(object):
     def insert_sell_info(cls, insert_dict, community_info_id):
         insert_command = 'INSERT INTO sell_info'+cls.time_str+'(code,release_time,price_all,'\
                          'price_per,first_pay,month_pay,floor,area_build,direction,'\
-                         'decoration,house_model,build_time,house_structure,house_type,property_type)'\
+                         'decoration,house_model,build_time,house_structure,house_type,property_type,'\
+                         'page_url,last_deal_time,building_type,crawl_time)'\
                          'VALUES(%(code)s,%(release_time)s,%(price_all)s,%(price_per)s,%(first_pay)s,'\
                          '%(month_pay)s,%(floor)s,%(area_build)s,%(direction)s,%(decoration)s,%(house_model)s,'\
-                         '%(build_time)s,%(house_structure)s,%(house_type)s,%(property_type)s)'
+                         '%(build_time)s,%(house_structure)s,%(house_type)s,%(property_type)s,%(page_url)s,'\
+                         '%(last_deal_time)s,%(building_type)s,%(crawl_time)s)'
         relation_command = 'INSERT INTO relation_community_sell'+cls.time_str+'(sell_info_id,community_info_id)'\
                            'VALUES(%(sell_info_id)s,%(community_info_id)s)'
         relation_dict = {}
@@ -104,12 +108,14 @@ class MySQLConnectorSF(object):
                          'rate,pay_type,house_type,house_model,area_build,floor,'\
                          'direction,decoration,support_bed,support_furniture,'\
                          'support_gas,support_warm,support_network,support_tv,'\
-                         'support_condition,support_fridge,support_wash,support_water)'\
+                         'support_condition,support_fridge,support_wash,support_water,'\
+                         'page_url,rent_type,crawl_time)'\
                          'VALUES(%(code)s,%(update_time)s,%(price)s,'\
                          '%(rate)s,%(pay_type)s,%(house_type)s,%(house_model)s,%(area_build)s,%(floor)s,'\
                          '%(direction)s,%(decoration)s,%(support_bed)s,%(support_furniture)s,'\
                          '%(support_gas)s,%(support_warm)s,%(support_network)s,%(support_tv)s,'\
-                         '%(support_condition)s,%(support_fridge)s,%(support_wash)s,%(support_water)s)'
+                         '%(support_condition)s,%(support_fridge)s,%(support_wash)s,%(support_water)s,'\
+                         '%(page_url)s,%(rent_type)s,%(crawl_time)s)'
         relation_command = 'INSERT INTO relation_community_rent'+cls.time_str+'(rent_info_id,community_info_id)'\
                            'VALUES(%(rent_info_id)s,%(community_info_id)s)'
         relation_dict = {}

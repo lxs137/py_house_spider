@@ -58,6 +58,9 @@ class SFDataBasePipeline(object):
             info_dict['post_office'] = item.get('post_office')
             info_dict['bank'] = item.get('bank')
             info_dict['other_facility'] = item.get('other_facility')
+
+            info_dict['property_company'] = None
+            info_dict['building_num_sum'] = None
             MySQLConnectorSF.insert_community_info(info_dict)
             return item
 

@@ -55,12 +55,14 @@ class RecordSpider(scrapy.Spider):
             meta_dict['area'] = int(float(re.match('[0-9]+', area_str).group()))
             url = item.find('dl', attrs={'class': 'clearfix'})\
                 .find('p', attrs={'class': 'fangTitle'}).find('a')['href']
+            meta_dict['page_url'] = url
             yield Request(url, callback=self.parse_sell_info, meta=meta_dict)
 
     def parse_sell_info(self, response):
         soup = BeautifulSoup(response.body, 'html5lib')
         sell_item = SellItem()
         sell_item['community_id'] = response.meta['community_id']
+        sell_item['page_url'] = response.meta['page_url']
         title_str = soup.find('div', attrs={'class': 'mainBoxL'})\
             .find('div', attrs={'class': 'title'}).find('p').get_text()
         title_str = ''.join(title_str.split())
@@ -101,6 +103,8 @@ class RecordSpider(scrapy.Spider):
                 sell_item['direction'] = dd_str[dd_str.find('：')+1:]
             elif dd_str.find('年代') != -1:
                 sell_item['build_time'] = int(re.search('[0-9]+', dd_str).group())
+            elif dd_str.find('建筑类别') != -1:
+                sell_item['building_type'] = dd_str[dd_str.find('：')+1:]
         return sell_item
 
     def rent_page_list(self, response):
@@ -117,17 +121,29 @@ class RecordSpider(scrapy.Spider):
 
     def parse_rent_list(self, response):
         soup = BeautifulSoup(response.body, 'html5lib')
+        meta_dict = {}
+        meta_dict['community_id'] = response.meta['community_id']
         rent_list = soup.find('div', attrs={'class': 'rentListwrap fangListwrap'})\
             .find_all('div', attrs={'class': 'fangList'})
         for item in rent_list:
+            info_str = item.find('dl', attrs={'class': 'clearfix'})\
+                .find('p', attrs={'class': 'mt5'}).get_text()
+            info_str = ''.join(info_str.split())
+            info_list = info_str.split('|')
+            for info_item in info_list:
+                if info_item.find('租') != -1:
+                    meta_dict['rent_type'] = info_item
             url = item.find('dl', attrs={'class': 'clearfix'})\
                 .find('p', attrs={'class': 'fangTitle'}).find('a')['href']
-            yield Request(url, callback=self.parse_rent_info, meta={'community_id': response.meta['community_id']})
+            meta_dict['page_url'] = url
+            yield Request(url, callback=self.parse_rent_info, meta=meta_dict)
 
     def parse_rent_info(self, response):
         soup = BeautifulSoup(response.body, 'html5lib')
         rent_item = RentItem()
         rent_item['community_id'] = response.meta['community_id']
+        rent_item['page_url'] = response.meta['page_url']
+        rent_item['rent_type'] = response.meta.get('rent_type')
         title_tag_list = soup.find('div', attrs={'class': 'h1-tit'})\
             .find('p', attrs={'class': 'gray9'}).find_all('span')
         code_str = title_tag_list[0].get_text()
