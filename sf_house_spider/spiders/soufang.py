@@ -12,7 +12,7 @@ class CommunitySpider(scrapy.Spider):
     base_url = 'http://esf.nanjing.fang.com/housing/'
     community = [u'鼓楼', u'江宁', u'浦口', u'玄武', u'建邺', u'栖霞', u'雨花',
                  u'秦淮', u'六合', u'溧水', u'高淳', u'南京周边']
-    # community = [u'鼓楼', u'江宁']
+    # community = [u'高淳', u'溧水']
     community_code = {u'鼓楼': '265', u'江宁': '268', u'浦口': '270', u'玄武': '264',
                       u'建邺': '267', u'栖霞': '271', u'雨花': '272', u'秦淮': '263',
                       u'六合': '269', u'溧水': '274', u'高淳': '275', u'南京周边': '13046'}

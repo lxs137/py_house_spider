@@ -46,10 +46,14 @@ class RecordSpider(scrapy.Spider):
         meta_dict = {}
         meta_dict['community_id'] = response.meta['community_id']
         for item in sell_list:
-            meta_dict['priceAll'] = int(float(item.find_all('ul', attrs={'class': 'Price'})[1].find('span').get_text()))
-            price_str = item.find_all('ul', attrs={'class': 'Price'})[1].find('li', attrs={'class': 'update'}).get_text()
-            price_str = ''.join(price_str.split())
-            meta_dict['pricePer'] = int(float(re.match('[0-9]+', price_str).group()))
+            try:
+                meta_dict['priceAll'] = int(float(item.find_all('ul', attrs={'class': 'Price'})[1].find('span').get_text()))
+                price_str = item.find_all('ul', attrs={'class': 'Price'})[1].find('li', attrs={'class': 'update'}).get_text()
+                price_str = ''.join(price_str.split())
+                meta_dict['pricePer'] = int(float(re.match('[0-9]+', price_str).group()))
+            except:
+                meta_dict['priceAll'] = None
+                meta_dict['pricePer'] = None
             area_str = item.find('ul', attrs={'class': 'Price area'}).get_text()
             area_str = ''.join(area_str.split())
             meta_dict['area'] = int(float(re.match('[0-9]+', area_str).group()))
@@ -149,9 +153,12 @@ class RecordSpider(scrapy.Spider):
         code_str = title_tag_list[0].get_text()
         code_str = ''.join(code_str.split())
         rent_item['code'] = 'sf_'+re.search(r'[0-9]+', code_str).group()
-        update_str = title_tag_list[1].get_text()
-        update_str = (update_str.split())[0]
-        rent_item['update_time'] = update_str[update_str.find('：')+1:]
+        try:
+            update_str = title_tag_list[1].get_text()
+            update_str = re.search(r'\d{4}[^\d]\d{1,2}[^\d]\d{1,2}', update_str).group()
+            rent_item['update_time'] = update_str
+        except:
+            rent_item['update_time'] = None
         info_list = soup.find('ul', attrs={'class': 'house-info'}).find_all('li')
         for info_tag in info_list:
             tag_name = info_tag.find('span', attrs={'class': 'info-tit'}).get_text()

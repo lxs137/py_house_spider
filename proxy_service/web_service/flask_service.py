@@ -12,13 +12,11 @@ service_info = {
 
 @app.route('/', methods=['GET'])
 def get_service_list():
-    print('index in')
     return jsonify(service_info)
 
 
 @app.route('/get/', methods=['GET'])
 def get_proxy():
-    print('get in')
     return ProxyManager().get_proxy()
 
 

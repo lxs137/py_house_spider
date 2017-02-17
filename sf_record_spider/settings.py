@@ -55,6 +55,8 @@ COOKIES_ENABLED = False
 DOWNLOADER_MIDDLEWARES = {
     'scrapy.contrib.downloadermiddleware.useragent.UserAgentMiddleware': None,
     'scrapy.contrib.downloadermiddleware.httpproxy.HttpProxyMiddleware': None,
+    'scrapy.contrib.downloadermiddleware.retry.RetryMiddleware': None,
+    'sf_record_spider.Download.retry.RetryMiddleware': 500,
     'sf_record_spider.Download.proxy.ProxyMiddleware': 100,
     'sf_record_spider.Download.user_agent.UserAgentMiddleware': 400,
 }
@@ -115,6 +117,6 @@ MYSQL_PASSWORD = '1q2w3e4r'
 MYSQL_PORT = '3306'
 MYSQL_DB_SF = 'house_sf'
 
-PROXY_SERVICE_ADDRESS = 'http://123.206.225.94:5000/'
-PROXY_MAX_USE = '20'
+PROXY_SERVICE_ADDRESS = 'http://127.0.0.1:5000/'
+PROXY_MAX_USE = '30'
 DEFAULT_PROXY = '222.33.192.238:8118'

@@ -12,11 +12,14 @@ class SFDataBasePipeline(object):
             if item['community_id']:
                 insert_dict['code'] = item['code']
 
-                time_str = item['release_time']
-                time_str = ''.join(time_str.split())
-                time_str = re.sub('[^0-9]', '-', time_str)
-                time_list = time_str.split('-')
-                insert_dict['release_time'] = date(int(time_list[0]), int(time_list[1]), int(time_list[2]))
+                try:
+                    time_str = item['release_time']
+                    time_str = re.search(r'\d{1,4}[^\d]\d{1,2}[^\d]\d{1,2}', time_str).group()
+                    time_str = re.sub(r'[^\d]', '-', time_str)
+                    time_list = time_str.split('-')
+                    insert_dict['release_time'] = date(int(time_list[0]), int(time_list[1]), int(time_list[2]))
+                except:
+                    insert_dict['release_time'] = None
 
                 insert_dict['price_all'] = item['price_all']
                 insert_dict['price_per'] = item['price_per']

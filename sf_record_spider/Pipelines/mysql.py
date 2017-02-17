@@ -18,6 +18,7 @@ class MySQLConnectorSF(object):
     else:
         cursor = cnx.cursor(buffered=True)
         time_str = time.strftime('_%Y_%m_%d', time.localtime())
+        community_info_dict = {}
 
     @classmethod
     def create_tables(cls):
@@ -28,7 +29,8 @@ class MySQLConnectorSF(object):
                             'decoration varchar(50),house_model varchar(50),build_time int,'\
                             'house_structure varchar(50),house_type varchar(50),'\
                             'property_type varchar(50),page_url varchar(255),last_deal_time date,'\
-                            'building_type varchar(100),crawl_time date)engine=innodb default charset=utf8')
+                            'building_type varchar(100),crawl_time date,community_name varchar(100),'\
+                            'community_code varchar(50),region varchar(100),address varchar(255))engine=innodb default charset=utf8')
         create_command.append('CREATE TABLE relation_community_sell'+cls.time_str+'(sell_info_id int NOT NULL,'\
                             'community_info_id int,foreign key(sell_info_id) references sell_info'+cls.time_str+'(sell_info_id) '\
                             'on delete cascade on update cascade)engine=innodb default charset=utf8')
@@ -39,7 +41,8 @@ class MySQLConnectorSF(object):
                             'support_furniture BOOLEAN,support_gas BOOLEAN,support_warm BOOLEAN,'\
                             'support_network BOOLEAN,support_tv BOOLEAN,support_condition BOOLEAN,'\
                             'support_fridge BOOLEAN,support_wash BOOLEAN,support_water BOOLEAN,'\
-                            'page_url varchar(255),rent_type varchar(50),crawl_time date)'\
+                            'page_url varchar(255),rent_type varchar(50),crawl_time date,'\
+                            'community_name varchar(100),community_code varchar(50),region varchar(100),address varchar(255))'\
                             'engine=innodb default charset=utf8')
         create_command.append('CREATE TABLE relation_community_rent'+cls.time_str+'(rent_info_id int NOT NULL,'\
                             'community_info_id int,foreign key(rent_info_id) references rent_info'+cls.time_str+'(rent_info_id) '\
@@ -75,9 +78,13 @@ class MySQLConnectorSF(object):
 
     @classmethod
     def select_community_url(cls):
-        select_command = 'SELECT sell_url,rent_url,record_url,community_info_id FROM community_info'+cls.time_str
+        select_command = 'SELECT sell_url,rent_url,record_url,community_info_id,name,code,'\
+                         'region,address FROM community_info'+cls.time_str
         cls.cursor.execute(select_command)
-        return cls.cursor.fetchall()
+        data_list = cls.cursor.fetchall()
+        for data_item in data_list:
+            cls.community_info_dict[int(data_item[3])] = (data_item[4], data_item[5], data_item[6], data_item[7])
+        return data_list
         # return [('http://jinyutixiangwk025.fang.com/chushou/'
         #          , 'http://jinyutixiangwk025.fang.com/chuzu/'
         #          , 'http://jinyutixiangwk025.fang.com/chengjiao/'
@@ -85,14 +92,19 @@ class MySQLConnectorSF(object):
 
     @classmethod
     def insert_sell_info(cls, insert_dict, community_info_id):
+        insert_dict['community_name'] = cls.community_info_dict[int(community_info_id)][0]
+        insert_dict['community_code'] = cls.community_info_dict[int(community_info_id)][1]
+        insert_dict['region'] = cls.community_info_dict[int(community_info_id)][2]
+        insert_dict['address'] = cls.community_info_dict[int(community_info_id)][3]
         insert_command = 'INSERT INTO sell_info'+cls.time_str+'(code,release_time,price_all,'\
                          'price_per,first_pay,month_pay,floor,area_build,direction,'\
                          'decoration,house_model,build_time,house_structure,house_type,property_type,'\
-                         'page_url,last_deal_time,building_type,crawl_time)'\
+                         'page_url,last_deal_time,building_type,crawl_time,community_name,community_code,region,address)'\
                          'VALUES(%(code)s,%(release_time)s,%(price_all)s,%(price_per)s,%(first_pay)s,'\
                          '%(month_pay)s,%(floor)s,%(area_build)s,%(direction)s,%(decoration)s,%(house_model)s,'\
                          '%(build_time)s,%(house_structure)s,%(house_type)s,%(property_type)s,%(page_url)s,'\
-                         '%(last_deal_time)s,%(building_type)s,%(crawl_time)s)'
+                         '%(last_deal_time)s,%(building_type)s,%(crawl_time)s,%(community_name)s,'\
+                         '%(community_code)s,%(region)s,%(address)s)'
         relation_command = 'INSERT INTO relation_community_sell'+cls.time_str+'(sell_info_id,community_info_id)'\
                            'VALUES(%(sell_info_id)s,%(community_info_id)s)'
         relation_dict = {}
@@ -104,18 +116,23 @@ class MySQLConnectorSF(object):
 
     @classmethod
     def insert_rent_info(cls, insert_dict, community_info_id):
+        insert_dict['community_name'] = cls.community_info_dict[int(community_info_id)][0]
+        insert_dict['community_code'] = cls.community_info_dict[int(community_info_id)][1]
+        insert_dict['region'] = cls.community_info_dict[int(community_info_id)][2]
+        insert_dict['address'] = cls.community_info_dict[int(community_info_id)][3]
         insert_command = 'INSERT INTO rent_info'+cls.time_str+'(code,update_time,price,'\
                          'rate,pay_type,house_type,house_model,area_build,floor,'\
                          'direction,decoration,support_bed,support_furniture,'\
                          'support_gas,support_warm,support_network,support_tv,'\
                          'support_condition,support_fridge,support_wash,support_water,'\
-                         'page_url,rent_type,crawl_time)'\
+                         'page_url,rent_type,crawl_time,community_name,community_code,region,address)'\
                          'VALUES(%(code)s,%(update_time)s,%(price)s,'\
                          '%(rate)s,%(pay_type)s,%(house_type)s,%(house_model)s,%(area_build)s,%(floor)s,'\
                          '%(direction)s,%(decoration)s,%(support_bed)s,%(support_furniture)s,'\
                          '%(support_gas)s,%(support_warm)s,%(support_network)s,%(support_tv)s,'\
                          '%(support_condition)s,%(support_fridge)s,%(support_wash)s,%(support_water)s,'\
-                         '%(page_url)s,%(rent_type)s,%(crawl_time)s)'
+                         '%(page_url)s,%(rent_type)s,%(crawl_time)s,%(community_name)s,%(community_code)s,'\
+                         '%(region)s,%(address)s)'
         relation_command = 'INSERT INTO relation_community_rent'+cls.time_str+'(rent_info_id,community_info_id)'\
                            'VALUES(%(rent_info_id)s,%(community_info_id)s)'
         relation_dict = {}
