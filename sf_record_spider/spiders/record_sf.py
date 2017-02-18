@@ -8,6 +8,13 @@ class RecordSpider(scrapy.Spider):
     name = 'sf_record_spider'
     pay_params_url = 'http://dai.fangtx.com/new/ReferenceYueG/index.html'
     month_pay_params = {'year_num': 30, 'rate': ['0.0475', '0.049', '0.0275', '0.0325'], 'cheng_num': 7}
+    support_attr_list = ['support_bed', 'support_furniture', 'support_gas', 'support_warm',
+                         'support_network', 'support_tv', 'support_condition', 'support_fridge',
+                         'support_wash', 'support_water']
+    support_attr_dict = {'support_bed': '床', 'support_furniture': '家具', 'support_gas': '煤气/天然气',
+                         'support_warm': '暖气', 'support_network': '宽带', 'support_tv': '有线电视',
+                         'support_condition': '空调', 'support_fridge': '冰箱',
+                         'support_wash': '洗衣机', 'support_water': '热水器'}
     def start_requests(self):
         MySQLConnectorSF.create_tables()
         sql_list = MySQLConnectorSF.select_community_url()
@@ -166,7 +173,7 @@ class RecordSpider(scrapy.Spider):
             tag_content = info_tag.get_text()
             tag_content = ''.join(tag_content.split())
             tag_content = tag_content[tag_content.find('：')+1:]
-            if tag_name.find('租金') != -1:
+            if tag_name.find('租') != -1:
                 rent_item['price'] = int(float(re.search(r'[0-9]+元', tag_content).group()[:-1]))
                 rent_item['pay_type'] = re.search('\[.*\]', tag_content).group()[1:-1]
                 try:
@@ -188,17 +195,21 @@ class RecordSpider(scrapy.Spider):
                         rent_item['house_model'] = content
                     else:
                         rent_item['house_type'] = content
-        js_text = soup.find('script').get_text()
-        support_list = re.search("'.*'", re.search(r'var peitao.*;', js_text).group()).group()[1:-1].split(',')
-        support_attr_list = ['support_bed', 'support_furniture', 'support_gas', 'support_warm',
-                           'support_network', 'support_tv', 'support_condition', 'support_fridge',
-                           'support_wash', 'support_water']
-        support_attr_dict = {'support_bed': '床', 'support_furniture': '家具', 'support_gas': '煤气/天然气',
-                             'support_warm': '暖气', 'support_network': '宽带', 'support_tv': '有线电视',
-                             'support_condition': '空调', 'support_fridge': '冰箱',
-                             'support_wash': '洗衣机', 'support_water': '热水器'}
-        for support_attr in support_attr_list:
-            if support_list.count(support_attr_dict[support_attr]) != 0:
+        js_list = soup.find_all('script')
+        need_find_price = (rent_item.get('price', None) == None)
+        support_list = []
+        for js_item in js_list:
+            js_text = js_item.get_text()
+            if need_find_price:
+                priceObj = re.search(r'var houseInfo = \{.*\};', js_text, re.DOTALL)
+                if priceObj:
+                    rent_item['price'] = int(float(re.search(r"price: '(\d+)',", priceObj.group()).group(1)))
+            searchObj = re.search(r'var peitao.*;', js_text)
+            if searchObj:
+                support_list = re.search("'.*'", searchObj.group()).group()[1:-1].split(',')
+
+        for support_attr in self.support_attr_list:
+            if support_list.count(self.support_attr_dict[support_attr]) != 0:
                 rent_item[support_attr] = 1
             else:
                 rent_item[support_attr] = 0

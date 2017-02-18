@@ -28,11 +28,11 @@ class ProxyMiddleware(object):
             return self.proxy
 
     def process_request(self, request, spider):
-        if request.meta.get('change_proxy', False):
-            self.proxy = self.update_proxy()
-            msg = 'ProxyMiddleware: Change proxy to:' + self.proxy
-            log.msg(msg, level=log.INFO)
-            request.meta['change_proxy'] = False
+        # if request.meta.get('change_proxy', False):
+        #     self.proxy = self.update_proxy()
+        #     msg = 'ProxyMiddleware: Change proxy to:' + self.proxy
+        #     log.msg(msg, level=log.INFO)
+        #     request.meta['change_proxy'] = False
         request.meta['proxy'] = 'http://'+self.proxy
         self.proxy_use += 1
         if self.proxy_use > self.max_use:

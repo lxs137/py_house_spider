@@ -38,7 +38,7 @@ class RetryMiddleware(object):
             retry_request.meta['retry_times'] = retry_times
             retry_request.dont_filter = True
             retry_request.priority = request.priority + self.priority_adjust
-            retry_request.meta['change_proxy'] = True
+            # retry_request.meta['change_proxy'] = True
             return retry_request
         else:
             msg = 'RetryMiddleware: Gave up retrying %(request)s (failed %(retry_times)d times)' % \
