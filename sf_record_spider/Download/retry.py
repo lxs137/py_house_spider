@@ -33,7 +33,7 @@ class RetryMiddleware(object):
         if retry_times < self.max_retry_times:
             msg = 'RetryMiddleware: Retrying %(request)s (failed %(retry_times)d times)' % \
                   {'request': request, 'retry_times': retry_times}
-            log.msg(msg, level=log.INFO)
+            log.msg(msg, level=log.DEBUG)
             retry_request = request.copy()
             retry_request.meta['retry_times'] = retry_times
             retry_request.dont_filter = True

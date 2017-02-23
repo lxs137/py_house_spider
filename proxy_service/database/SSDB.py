@@ -37,6 +37,27 @@ class SSDBManager(object):
         else:
             return None
 
+    def incre_hashmap_item(self, name, item, increment, base):
+        if not self.c.hexists(name, item):
+            self.c.hset(name, item, base)
+        self.c.hincr(name, item, increment)
+
+    def clear_hashmap(self, name):
+        self.c.hclear(name)
+
+    def get_hashmap_key(self, name, value_min):
+        kv_list = self.c.hgetall(name)
+        kv_list_size = len(kv_list)
+        key_list = []
+        for i in range(kv_list_size):
+            if i % 2 == 0:
+                value = kv_list[i+1]
+                if value >= value_min:
+                    key_list.append(kv_list[i])
+            else:
+                continue
+        return key_list
+
     def close_connect(self):
         self.c.disconnect()
 
@@ -46,5 +67,5 @@ class SSDBManager(object):
 
 if __name__ == '__main__':
     c = Client(host='127.0.0.1', port=8888)
-    c.qclear('no_list')
-    print('clear')
+    map = c.hgetall('connect_error_num')
+    print(type(map))

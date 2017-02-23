@@ -113,7 +113,11 @@ class RecordSpider(scrapy.Spider):
             elif dd_str.find('朝向') != -1:
                 sell_item['direction'] = dd_str[dd_str.find('：')+1:]
             elif dd_str.find('年代') != -1:
-                sell_item['build_time'] = int(re.search('[0-9]+', dd_str).group())
+                timeObj = re.search('[0-9]+', dd_str)
+                if timeObj:
+                    sell_item['build_time'] = int(timeObj.group())
+                else:
+                    sell_item['build_time'] = None
             elif dd_str.find('建筑类别') != -1:
                 sell_item['building_type'] = dd_str[dd_str.find('：')+1:]
         return sell_item
@@ -174,7 +178,10 @@ class RecordSpider(scrapy.Spider):
             tag_content = ''.join(tag_content.split())
             tag_content = tag_content[tag_content.find('：')+1:]
             if tag_name.find('租') != -1:
-                rent_item['price'] = int(float(re.search(r'[0-9]+元', tag_content).group()[:-1]))
+                try:
+                    rent_item['price'] = int(float(re.search(r'[0-9]+元', tag_content).group()[:-1]))
+                except:
+                    rent_item['price'] = None
                 rent_item['pay_type'] = re.search('\[.*\]', tag_content).group()[1:-1]
                 try:
                     rent_item['rate'] = float((re.search(r'[0-9|.|-]+%', tag_content).group())[:-1])

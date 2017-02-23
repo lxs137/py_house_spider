@@ -97,8 +97,8 @@ ITEM_PIPELINES = {
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
 # log信息设置
-LOG_FILE = '/home/lxs/scrapy_record.log'
-LOG_LEVEL = 'INFO'
+# LOG_FILE = '/home/lxs/scrapy_record.log'
+# LOG_LEVEL = 'INFO'
 
 # 内存占用监控
 MEMUSAGE_ENABLED = True
@@ -106,7 +106,7 @@ MEMUSAGE_WARNING_MB = 768
 MEMUSAGE_NOTIFY_MAIL = ['lxs137@hotmail.com']
 
 # Twisted线程池同时允许的线程数量
-REACTOR_THREADPOOL_MAXSIZE = 20
+REACTOR_THREADPOOL_MAXSIZE = 15
 
 # 自动发送的邮件设置
 MAIL_FROM = 'scrapy@qcloud.centos.com'
@@ -117,6 +117,6 @@ MYSQL_PASSWORD = '1q2w3e4r'
 MYSQL_PORT = '3306'
 MYSQL_DB_SF = 'house_sf'
 
-PROXY_SERVICE_ADDRESS = 'http://127.0.0.1:5000/'
+PROXY_SERVICE_ADDRESS = 'http://123.206.225.94:80/'
 PROXY_MAX_USE = '30'
 DEFAULT_PROXY = '222.33.192.238:8118'

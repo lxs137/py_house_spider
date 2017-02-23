@@ -48,11 +48,8 @@ class ProxySpider(object):
         m_headers = {'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
                      'Accept-Encoding': 'gzip, deflate, sdch',
                      'Accept-Language': 'zh-CN,zh;q=0.8',
-                     'Cache-Control': 'max-age=0',
                      'Connection': 'keep-alive',
                      'Host': 'www.kuaidaili.com',
-                     'Referer': 'http://www.kuaidaili.com/pricing/',
-                     'Upgrade-Insecure-Requests': '1',
                      'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36'}
         for i in range(1, 11):
             url = 'http://www.kuaidaili.com/proxylist/'+str(i)+'/'
