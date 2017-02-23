@@ -39,6 +39,6 @@ class ProxyMiddleware(object):
             self.proxy_use = 0
             self.proxy = self.update_proxy()
             msg = 'Change proxy to:'+self.proxy
-            log.msg(msg, level=log.DEBUG)
+            log.msg(msg, level=log.INFO)
         # request.meta['proxy'] = 'http://110.206.127.136:9797'
 

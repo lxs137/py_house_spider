@@ -97,8 +97,8 @@ ITEM_PIPELINES = {
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
 # log信息设置
-# LOG_FILE = '/home/lxs/scrapy_record.log'
-# LOG_LEVEL = 'INFO'
+LOG_FILE = '/home/lxs/scrapy_record.log'
+LOG_LEVEL = 'INFO'
 
 # 内存占用监控
 MEMUSAGE_ENABLED = True
