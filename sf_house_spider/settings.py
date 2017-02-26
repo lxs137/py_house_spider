@@ -96,7 +96,7 @@ ITEM_PIPELINES = {
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
 # LOG_FILE = '/home/lxs/scrapy_community.log'
-# LOG_LEVEL = 'INFO'
+LOG_LEVEL = 'INFO'
 
 # Twisted线程池同时允许的线程数量
 REACTOR_THREADPOOL_MAXSIZE = 20
@@ -108,11 +108,14 @@ MYSQL_PASSWORD = '1q2w3e4r'
 MYSQL_PORT = '3306'
 MYSQL_DB_SF = 'house_sf'
 
-PROXY_SERVICE_ADDRESS = 'http://123.206.225.94:80/'
+PROXY_SERVICE_ADDRESS = 'http://118.89.107.231:80/'
 PROXY_MAX_USE = '30'
 DEFAULT_PROXY = '222.33.192.238:8118'
 
-REDIS_HOST = 'localhost'
+REDIS_HOST = '123.206.225.94'
 REDIS_PORT = 6379
 REDIS_PASSWORD = '1q2w3e4r'
+
+SCHEDULER_PERSIST = False
+SCHEDULER = 'sf_house_spider.distribute_util.request_scheduler.RedisScheduler'
 

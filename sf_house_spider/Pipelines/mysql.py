@@ -2,6 +2,8 @@ import mysql.connector
 from mysql.connector import errorcode
 from sf_house_spider import settings
 import time
+import threading
+from sf_house_spider.Pipelines.decorator_util import thread_safe_sql
 
 class MySQLConnectorSF(object):
     try:
@@ -19,6 +21,7 @@ class MySQLConnectorSF(object):
     else:
         cursor = cnx.cursor(buffered=True)
         time_str = time.strftime('_%Y_%m_%d', time.localtime())
+        lock = threading.Lock()
 
     @classmethod
     def create_table(cls):
@@ -51,7 +54,9 @@ class MySQLConnectorSF(object):
         cls.cnx.close()
 
     @classmethod
+    @thread_safe_sql
     def insert_community_info(cls, info_dict):
+        # cls.lock.acquire()
         insert_command = 'INSERT INTO community_info'+cls.time_str+'( \
                          code,name,page_url,sell_url,rent_url,record_url,price_cur,ratio_month,address, \
                          community_feature,region,property,manage_type,done_time, \
@@ -74,9 +79,10 @@ class MySQLConnectorSF(object):
                          %(other_facility)s, %(property_company)s, %(building_num_sum)s)'
         cls.cursor.execute(insert_command, info_dict)
         cls.cnx.commit()
-        pass
+        # cls.lock.release()
 
     @classmethod
+    @thread_safe_sql
     def select_if_exist(cls, page_url):
         select_command = 'SELECT EXISTS(SELECT 1 FROM community_info'+cls.time_str+' WHERE page_url=%(page_url)s)'
         value = {'page_url': page_url}
@@ -85,3 +91,5 @@ class MySQLConnectorSF(object):
             return True
         else:
             return False
+
+

@@ -1,13 +1,10 @@
 from scrapy.utils.request import request_fingerprint
 from scrapy.dupefilters import BaseDupeFilter
-from redis import Redis
 
 
 class RedisDupeFilter(BaseDupeFilter):
-    def __init__(self, settings, dupefilter_key):
-        self.server = Redis(host=settings.get('REDIS_HOST', 'localhost'),
-                            port=settings.get('REDIS_PORT', 6379),
-                            password=settings.get('REDIS_PASSWORD', None))
+    def __init__(self, server, dupefilter_key):
+        self.server = server
         self.key = dupefilter_key
 
     def close(self, reason):

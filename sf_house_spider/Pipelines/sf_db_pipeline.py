@@ -2,6 +2,8 @@ from sf_house_spider.items import CommunityItem
 from sf_house_spider.Pipelines.mysql import MySQLConnectorSF
 from datetime import date
 import re
+import functools
+from twisted.internet.threads import deferToThread
 
 class SFDataBasePipeline(object):
 
@@ -61,7 +63,9 @@ class SFDataBasePipeline(object):
 
             info_dict['property_company'] = None
             info_dict['building_num_sum'] = None
-            MySQLConnectorSF.insert_community_info(info_dict)
+            insert_func = functools.partial(MySQLConnectorSF.insert_community_info, info_dict)
+            deferToThread(insert_func)
+            # MySQLConnectorSF.insert_community_info(info_dict)
             return item
 
     def parse_number(self, str, returnFloat):
