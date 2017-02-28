@@ -40,3 +40,4 @@ class RedisRequestQueue(object):
         # 因此将request.priority取负数作为member的score
         self.server.zadd(self.key, request_data, -request.priority)
 
+

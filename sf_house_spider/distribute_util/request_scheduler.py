@@ -59,6 +59,9 @@ class RedisScheduler(object):
     def has_pending_requests(self):
         return len(self.queue) > 0
 
-
-
+    def __del__(self):
+        reason = 'KeyBoard ctrl+c to stop'
+        if not self.persist:
+            self.queue.close(reason)
+            self.dupefilter.close(reason)
 

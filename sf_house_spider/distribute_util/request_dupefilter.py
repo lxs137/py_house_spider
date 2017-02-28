@@ -19,3 +19,4 @@ class RedisDupeFilter(BaseDupeFilter):
         else:
             self.server.sadd(self.key, fingerprint)
             return False
+
