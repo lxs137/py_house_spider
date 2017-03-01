@@ -57,7 +57,7 @@ DOWNLOADER_MIDDLEWARES = {
     'scrapy.contrib.downloadermiddleware.httpproxy.HttpProxyMiddleware': None,
     'scrapy.contrib.downloadermiddleware.retry.RetryMiddleware': None,
     'sf_house_spider.Download.retry.RetryMiddleware': 500,
-    'sf_house_spider.Download.proxy.ProxyMiddleware': None,
+    'sf_house_spider.Download.proxy.ProxyMiddleware': 100,
     'sf_house_spider.Download.user_agent.UserAgentMiddleware': 400,
 }
 
@@ -95,14 +95,14 @@ ITEM_PIPELINES = {
 # HTTPCACHE_IGNORE_HTTP_CODES = []
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
-# LOG_FILE = '/home/lxs/scrapy_community.log'
+LOG_FILE = '/home/lxs/spider_log/scrapy_community.log'
 LOG_LEVEL = 'INFO'
 
 # Twisted线程池同时允许的线程数量
 REACTOR_THREADPOOL_MAXSIZE = 20
 
 
-MYSQL_HOSTS = '123.206.225.94'
+MYSQL_HOSTS = '118.89.107.231'
 MYSQL_USER = 'root'
 MYSQL_PASSWORD = '1q2w3e4r'
 MYSQL_PORT = '3306'
