@@ -211,6 +211,7 @@ class RecordSpider(scrapy.Spider):
                 priceObj = re.search(r'var houseInfo = \{.*\};', js_text, re.DOTALL)
                 if priceObj:
                     rent_item['price'] = int(float(re.search(r"price: '(\d+)',", priceObj.group()).group(1)))
+                    rent_item['rate'] = 0.00
             searchObj = re.search(r'var peitao.*;', js_text)
             if searchObj:
                 support_list = re.search("'.*'", searchObj.group()).group()[1:-1].split(',')
