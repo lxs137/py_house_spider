@@ -76,6 +76,8 @@ class ProxyManager(object):
         self.mutli_thread_lock = threading.Lock()
         self.stop_reactor_lock = threading.Lock()
         mutli_check_func = functools.partial(self.mutli_thread_check, all_list)
+        if reactor._startedBefore:
+            reactor.__init__()
         # 将启动多线程的函数放入reactor的主线程，便于停止
         reactor.callFromThread(mutli_check_func)
         reactor.run()
