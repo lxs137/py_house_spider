@@ -51,7 +51,7 @@ class ProxySpider(object):
                      'Connection': 'keep-alive',
                      'Host': 'www.kuaidaili.com',
                      'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36'}
-        for i in range(1, 11):
+        for i in range(1, 6):
             url = 'http://www.kuaidaili.com/proxylist/'+str(i)+'/'
             html = cls.requests_get(url, headers=m_headers)
             if html == None:
@@ -136,6 +136,55 @@ class ProxySpider(object):
                     port_str = td_item.find_next('td').get_text()
                     port_str = ''.join(port_str.split())
                     ipList.append(ip+':'+port_str)
+        return ipList
+
+    @classmethod
+    @robust_crawl
+    def get_mimiip(cls):
+        # http://www.mimiip.com
+        ipList = []
+        for i in range(1, 3):
+            response = cls.requests_get('http://www.mimiip.com/gngao/'+str(i))
+            if response == None:
+                continue
+            soup = BeautifulSoup(response.text, 'lxml')
+            tr_list = soup.find('table', attrs={'class': 'list'}).find_all('tr')
+            for tr_item in tr_list:
+                if tr_item.find('th'):
+                    continue
+                td_list = tr_item.find_all('td')
+                for td_item in td_list:
+                    td_str = td_item.get_text()
+                    td_str = ''.join(td_str.split())
+                    searchObj = re.search(r'\d{0,3}\.\d{0,3}\.\d{0,3}\.\d{0,3}', td_str)
+                    if searchObj:
+                        ip = searchObj.group()
+                        port_str = td_item.find_next('td').get_text()
+                        port_str = ''.join(port_str.split())
+                        ipList.append(ip + ':' + port_str)
+        return ipList
+
+    @classmethod
+    @robust_crawl
+    def get_ip181(cls):
+        ipList = []
+        for i in range(1, 4):
+            response = cls.requests_get('http://www.ip181.com/daili/%d.html' % i)
+            if response == None:
+                continue
+            soup = BeautifulSoup(response.text, 'lxml')
+            tr_list = soup.find('div', attrs={'class': 'panel-body'}).find('table').find_all('tr')
+            for tr_item in tr_list:
+                td_list = tr_item.find_all('td')
+                for td_item in td_list:
+                    td_str = td_item.get_text()
+                    td_str = ''.join(td_str.split())
+                    searchObj = re.search(r'\d{0,3}\.\d{0,3}\.\d{0,3}\.\d{0,3}', td_str)
+                    if searchObj:
+                        ip = searchObj.group()
+                        port_str = td_item.find_next('td').get_text()
+                        port_str = ''.join(port_str.split())
+                        ipList.append(ip + ':' + port_str)
         return ipList
 
     @classmethod
@@ -228,4 +277,3 @@ class ProxySpider(object):
             return True
         else:
             return False
-

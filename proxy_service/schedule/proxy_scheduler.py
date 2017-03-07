@@ -14,10 +14,10 @@ class ProxyScheduler(object):
         self.scheduler = BlockingScheduler()
         self.lock = threading.Lock()
         refresh_run_time = datetime.datetime.now()+datetime.timedelta(minutes=1)
-        clear_run_time = datetime.datetime.now()+datetime.timedelta(hours=36)
-        # 每隔12个小时刷新一次代理池，每隔48小时清空可用代理并重新验证
-        self.scheduler.add_job(self.refresh_proxy_pool, 'interval', hours=12, next_run_time=refresh_run_time)
-        self.scheduler.add_job(self.clear_proxy_pool, 'interval', hours=48, next_run_time=clear_run_time)
+        clear_run_time = datetime.datetime.now()+datetime.timedelta(hours=12)
+        # 每隔6个小时刷新一次代理池，每隔24小时清空可用代理并重新验证
+        self.scheduler.add_job(self.refresh_proxy_pool, 'interval', hours=6, next_run_time=refresh_run_time)
+        self.scheduler.add_job(self.clear_proxy_pool, 'interval', hours=24, next_run_time=clear_run_time)
 
     @my_log(log_name='schedule.log')
     def refresh_proxy_pool(self):
