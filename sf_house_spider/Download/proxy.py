@@ -20,10 +20,7 @@ class ProxyMiddleware(object):
                 searchObj = re.search(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d{1,5}', response.text)
                 if searchObj:
                     return searchObj.group()
-                else:
-                    return self.proxy
-            else:
-                return self.proxy
+            return self.proxy
         except:
             return self.proxy
 
