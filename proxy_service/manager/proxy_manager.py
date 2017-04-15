@@ -78,6 +78,7 @@ class ProxyManager(object):
         mutli_check_func = functools.partial(self.mutli_thread_check, all_list)
         if reactor._startedBefore:
             reactor.__init__()
+        # callFromThread将阻塞调用该函数的线程
         # 将启动多线程的函数放入reactor的主线程，便于停止
         reactor.callFromThread(mutli_check_func)
         reactor.run()
@@ -88,6 +89,7 @@ class ProxyManager(object):
         for proxy in all_list:
             self.unchecked_proxy += 1
             check_func = functools.partial(self.check_proxy, proxy)
+            # callInThread不阻塞调用该函数的线程，而是将函数放入reactor的线程池中运行
             # 将代理验证操作放入twisted线程池中执行
             reactor.callInThread(check_func)
         self.stop_reactor_lock.acquire()
@@ -101,7 +103,7 @@ class ProxyManager(object):
         self.unchecked_proxy -= 1
         if check_result:
             self.valid_proxy.append(proxy)
-        # 当所有代理验证完毕后，退出reactor
+        # 当所有代理验证完毕后，释放阻塞mutli_thread_check函数的锁，退出reactor
         if self.unchecked_proxy <= 0:
             self.stop_reactor_lock.release()
         self.mutli_thread_lock.release()
