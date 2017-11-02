@@ -188,6 +188,17 @@ class ProxySpider(object):
         return ipList
 
     @classmethod
+    @robust_crawl
+    def get_cybersyndrome(cls):
+        ipList = []
+        res = cls.requests_get('http://www.cybersyndrome.net/pla6.html')
+        if(res == None):
+            return ipList
+        soup = BeautifulSoup(res.text, 'lxml')
+        script_text = soup.find('div', id='content').find('ol').find_next('script').get_text()
+         
+
+    @classmethod
     def requests_get(cls, url, num_retries=3, proxy_str=None, headers=None):
         time.sleep(cls.download_delay)
         if headers == None:
@@ -222,49 +233,50 @@ class ProxySpider(object):
     @classmethod
     @robust_check
     def check_anonymous(cls, proxy_str):
-        host_ip = cls.get_host_ip()
-        response = cls.requests_get('http://www.cybersyndrome.net/env.cgi', proxy_str=proxy_str)
-        if response == None:
-            return False
-        soup = BeautifulSoup(response.text, 'lxml')
-        try:
-            proxy_tds = soup.find('td', string='REMOTE_ADDR').next_siblings
-        except:
-            return False
-        has_find = False
-        check_proxy = ''
-        for td_item in proxy_tds:
-            if isinstance(td_item, NavigableString):
-                continue
-            searchObj = re.search(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}', td_item.get_text())
-            if searchObj:
-                has_find = True
-                check_proxy = searchObj.group()
-                check_proxy = ''.join(check_proxy.split())
-        if not has_find:
-            return False
-        try:
-            dd_list = soup.find('div', attrs={'id': 'sidebar'}).find('dl').find_all('dd')
-        except:
-            return False
-        country = ''
-        anonymous = ''
-        for dd_item in dd_list:
-            if dd_item.find('span') == None:
-                country = dd_item.get_text()
-                country = ''.join(country.split())
-            else:
-                anonymous = dd_item.find('span').get_text()
-                anonymous = ''.join(anonymous.split())
-        print('check_proxy:', check_proxy, '; country:', country, '; anonymous:', anonymous)
-        if check_proxy == host_ip:
-            return False
-        elif country != '中国(China)':
-            return False
-        elif anonymous == 'Non-Anonymous':
-            return False
-        else:
-            return True
+
+        # host_ip = cls.get_host_ip()
+        # response = cls.requests_get('http://www.cybersyndrome.net/env.cgi', proxy_str=proxy_str)
+        # if response == None:
+        #     return False
+        # soup = BeautifulSoup(response.text, 'lxml')
+        # try:
+        #     proxy_tds = soup.find('td', string='REMOTE_ADDR').next_siblings
+        # except:
+        #     return False
+        # has_find = False
+        # check_proxy = ''
+        # for td_item in proxy_tds:
+        #     if isinstance(td_item, NavigableString):
+        #         continue
+        #     searchObj = re.search(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}', td_item.get_text())
+        #     if searchObj:
+        #         has_find = True
+        #         check_proxy = searchObj.group()
+        #         check_proxy = ''.join(check_proxy.split())
+        # if not has_find:
+        #     return False
+        # try:
+        #     dd_list = soup.find('div', attrs={'id': 'sidebar'}).find('dl').find_all('dd')
+        # except:
+        #     return False
+        # country = ''
+        # anonymous = ''
+        # for dd_item in dd_list:
+        #     if dd_item.find('span') == None:
+        #         country = dd_item.get_text()
+        #         country = ''.join(country.split())
+        #     else:
+        #         anonymous = dd_item.find('span').get_text()
+        #         anonymous = ''.join(anonymous.split())
+        # print('check_proxy:', check_proxy, '; country:', country, '; anonymous:', anonymous)
+        # if check_proxy == host_ip:
+        #     return False
+        # elif country != '中国(China)':
+        #     return False
+        # elif anonymous == 'Non-Anonymous':
+        #     return False
+        # else:
+        #     return True
 
     @classmethod
     @robust_check
