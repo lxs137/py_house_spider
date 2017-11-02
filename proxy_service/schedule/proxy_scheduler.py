@@ -4,19 +4,20 @@ from proxy_service.util.crawl_decorator import my_log
 import datetime
 import threading
 import os
+import sys
 
 
 class ProxyScheduler(object):
 
     @my_log(log_name='schedule.log')
-    def __init__(self):
+    def __init__(self, refresh_freq):
         self.manager = ProxyManager()
         self.scheduler = BlockingScheduler()
         self.lock = threading.Lock()
         refresh_run_time = datetime.datetime.now()+datetime.timedelta(minutes=1)
         clear_run_time = datetime.datetime.now()+datetime.timedelta(hours=12)
         # 每隔6个小时刷新一次代理池，每隔24小时清空可用代理并重新验证
-        self.scheduler.add_job(self.refresh_proxy_pool, 'interval', hours=6, next_run_time=refresh_run_time)
+        self.scheduler.add_job(self.refresh_proxy_pool, 'interval', hours=refresh_freq, next_run_time=refresh_run_time)
         self.scheduler.add_job(self.clear_proxy_pool, 'interval', hours=24, next_run_time=clear_run_time)
 
     @my_log(log_name='schedule.log')
@@ -53,8 +54,8 @@ class ProxyScheduler(object):
         print('ProxyScheduler: remove all jobs.')
 
 if __name__ == '__main__':
-    f_pid = open('../proxy_service/schedule.pid', 'a')
-    f_pid.write('\npython: %d' % (os.getpid()))
-    f_pid.close()
-    m_scheduler = ProxyScheduler()
+    if len(sys.argv) > 1:
+        m_scheduler = ProxyScheduler(int(sys.argv[1]))
+    else:
+        m_scheduler = ProxyScheduler(3)
     m_scheduler.start_scheduler()
