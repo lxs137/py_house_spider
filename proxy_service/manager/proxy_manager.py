@@ -42,17 +42,12 @@ class ProxyManager(object):
     def get_unchecked_proxy(self):
         unchecked_list = []
         extend_list = []
-        # extend_list.append(ProxySpider.get_haoip())
-        # print('haoip done:', extend_list[len(extend_list)-1])
 
         extend_list.append(ProxySpider.get_kuaidaili())
         print('kuaidaili done:', extend_list[len(extend_list) - 1])
 
         extend_list.append(ProxySpider.get_66daili())
         print('66daili done:', extend_list[len(extend_list) - 1])
-
-        # extend_list.append(ProxySpider.get_youdaili())
-        # print('youdaili done:', extend_list[len(extend_list) - 1])
 
         extend_list.append(ProxySpider.get_xicidaili())
         print('xicidaili done:', extend_list[len(extend_list) - 1])
@@ -62,6 +57,10 @@ class ProxyManager(object):
 
         extend_list.append(ProxySpider.get_ip181())
         print('ip181daili done:', extend_list[len(extend_list) - 1])
+
+        extend_list.append(ProxySpider.get_coderbusy())
+        print('codebusy done:', extend_list[len(extend_list) - 1])
+        
         for list_item in extend_list:
             if list_item != None:
                 unchecked_list.extend(list_item)

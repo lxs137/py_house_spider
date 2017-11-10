@@ -29,19 +29,6 @@ class ProxySpider(object):
 
     @classmethod
     @robust_crawl
-    def get_haoip(cls):
-        # http://haoip.cc/
-        html = cls.requests_get('http://haoip.cc/tiqu.htm')
-        if html == None:
-            return None
-        ipListStr = re.findall(r'[.|:|0-9]+<br/>', html.text, re.S)
-        ipList = []
-        for list_str in ipListStr:
-            ipList.append(list_str.replace(r'<br/>', ''))
-        return ipList
-
-    @classmethod
-    @robust_crawl
     def get_kuaidaili(cls):
         # http://www.kuaidaili.com/
         ipList = []
@@ -65,40 +52,6 @@ class ProxySpider(object):
                     ip = tr_item.find('td', attrs={'data-title': 'IP'}).get_text()
                     port = tr_item.find('td', attrs={'data-title': 'PORT'}).get_text()
                     ipList.append(ip+':'+port)
-        return ipList
-
-    @classmethod
-    @robust_crawl
-    def get_youdaili(cls):
-        # http://www.youdaili.net/
-        ipList = []
-        base_html = cls.requests_get('http://www.youdaili.net/Daili/http')
-        if base_html == None:
-            return None
-        soup = BeautifulSoup(base_html.text, 'lxml')
-        detail_url = soup.find('div', attrs={'class': 'chunlist'}).find_all('li')[0]\
-            .find('p').find('a')['href']
-        detail_html = cls.requests_get(detail_url)
-        if detail_html == None:
-            return None
-        soup = BeautifulSoup(detail_html.text, 'lxml')
-        page_str = soup.find('div', attrs={'class': 'pagebreak'}).find_all('li')[0]\
-            .find('a').get_text()
-        max_page = int(re.search('[0-9]+', page_str).group())
-        for i in range(1, max_page+1):
-            if i > 1:
-                page_html = cls.requests_get(detail_url[:detail_url.find('.html')]\
-                                             +'_'+str(i)+'.html')
-                if page_html == None:
-                    return None
-                soup = BeautifulSoup(page_html.text, 'lxml')
-            p_list = soup.find('div', attrs={'class': 'arc'})\
-                .find('div', attrs={'class': 'content'}).find_all('p')
-            for p_item in p_list:
-                ip_str = p_item.get_text()
-                matchObj = re.search(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d{1,5}', ip_str)
-                if matchObj:
-                    ipList.append(matchObj.group())
         return ipList
 
     @classmethod
@@ -196,6 +149,26 @@ class ProxySpider(object):
             return ipList
         soup = BeautifulSoup(res.text, 'lxml')
         script_text = soup.find('div', id='content').find('ol').find_next('script').get_text()
+
+    @classmethod
+    @robust_crawl
+    def get_coderbusy(cls):
+        urls = ['https://proxy.coderbusy.com/zh-cn/classical/country/cn.aspx']
+        for i in range(2, 6):
+            urls.append('https://proxy.coderbusy.com/zh-cn/classical/country/cn/p%d.aspx' % i)
+        ipList = []
+        for url in urls:
+            res = cls.requests_get(url)
+            if(res != None):
+                soup = BeautifulSoup(res.text, 'lxml')
+                lines = soup.find('table').find('tbody').find_all('tr')
+                for line in lines:
+                    hostSearch = re.search(r'\d{0,3}\.\d{0,3}\.\d{0,3}\.\d{0,3}', line.find('td').get_text())
+                    if hostSearch:
+                        host = hostSearch.group()
+                        port = line.find('td').find_next('td').get_text()
+                        ipList.append(host + ':' + port)
+        return ipList
          
 
     @classmethod
@@ -233,6 +206,7 @@ class ProxySpider(object):
     @classmethod
     @robust_check
     def check_anonymous(cls, proxy_str):
+        return True;
 
         # host_ip = cls.get_host_ip()
         # response = cls.requests_get('http://www.cybersyndrome.net/env.cgi', proxy_str=proxy_str)
