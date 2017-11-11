@@ -101,7 +101,10 @@ class ProxyManager(object):
         self.mutli_thread_lock.acquire()
         self.unchecked_proxy -= 1
         if check_result:
+            print(proxy, ': valid')
             self.valid_proxy.append(proxy)
+        else:
+            print(proxy, ': not valid')
         # 当所有代理验证完毕后，释放阻塞mutli_thread_check函数的锁，退出reactor
         if self.unchecked_proxy <= 0:
             self.stop_reactor_lock.release()

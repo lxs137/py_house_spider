@@ -3,6 +3,7 @@ import re
 import requests
 import random
 import time
+import urllib
 from bs4 import BeautifulSoup, NavigableString
 
 
@@ -169,6 +170,45 @@ class ProxySpider(object):
                         port = line.find('td').find_next('td').get_text()
                         ipList.append(host + ':' + port)
         return ipList
+
+    @classmethod
+    @robust_crawl
+    def get_cybersyndrome(cls):
+        ipList = []
+        res = requests.get('http://www.cybersyndrome.net/pla6.html')
+        soup = BeautifulSoup(res.text, 'lxml')
+        js_code = soup.find('ol').find_next('script').get_text()
+        js_code = js_code.split(';')
+
+        as_array = []
+        searchObj_as = re.search(r'\[.*\]', js_code[0])
+        if searchObj_as:
+            as_array = eval(searchObj_as.group())
+
+        ps = []
+        searchObj_ps = re.search(r'\[.*\]', js_code[1])
+        if searchObj_ps:
+            ps = eval(searchObj_ps.group())
+
+        cut_length = eval(js_code[2].replace('var n=', ''))
+        as_array = as_array[cut_length:] + as_array[0:cut_length]
+
+        proxies = [];
+        for i, val in enumerate(as_array):
+            if i % 4 == 0:
+                single_proxy = str(val) + "."
+            elif i % 4 == 3:
+                single_proxy += str(val)
+                single_proxy += ":" + str(ps[i / 4])
+                proxies.append(single_proxy)
+            else:
+                single_proxy += (str(val) + ".")
+
+        lines = soup.find('ol').find_all('li')
+        for i, line in enumerate(lines):
+            if line.a["id"] == "n%d" % (i + 1) and re.search(r'CN', line.a["onmouseover"]):
+                ipList.append(proxies[i])
+        return ipList
          
 
     @classmethod
@@ -191,6 +231,26 @@ class ProxySpider(object):
             return None
 
     @classmethod
+    def requests_post(cls, url, num_retries=3, proxy_str=None, headers=None):
+        time.sleep(cls.download_delay)
+        if headers == None:
+            headers = {'User-Agent': random.choice(cls.user_agent_list)}
+        timeout = 5
+        if proxy_str == None:
+            r = requests.post(url, headers=headers, timeout=timeout)
+        else:
+            proxy_dict = {'http': 'http://'+proxy_str}
+            r = requests.post(url, headers=headers, timeout=timeout, proxies=proxy_dict)
+        if r.status_code == 200:
+            return r
+        elif num_retries > 0:
+            return cls.requests_post(url, num_retries=num_retries-1, proxy_str=proxy_str)
+        else:
+            print('Request error:', url)
+            return None
+
+
+    @classmethod
     @robust_crawl
     def get_host_ip(cls):
         default_host = '123.206.225.94'
@@ -206,51 +266,36 @@ class ProxySpider(object):
     @classmethod
     @robust_check
     def check_anonymous(cls, proxy_str):
-        return True;
+    m_headers = {
+        "Host": "www.cybersyndrome.net",
+        "Connection": "keep-alive",
+        "Content-Length": "0",
+        "X-CS-Proxy": None,
+        "X-CS-Sid": "start",
+        "Origin": "http://www.cybersyndrome.net",
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Accept": "*/*",
+        "Referer": "http://www.cybersyndrome.net/pc.cgi",
+        "Accept-Encoding": "gzip, deflate",
+        "Accept-Language": "zh-CN,zh;q=0.8,en;q=0.6"
+    };
+    res = cls.requests_post('http://www.cybersyndrome.net/pc_s.cgi?t=' 
+        + str(int(round(time.time()*1000))), headers = m_headers);
+    if res == None or res.status_code != 200:
+        return false
+    sid = res.headers["X-CS-Sid"]
 
-        # host_ip = cls.get_host_ip()
-        # response = cls.requests_get('http://www.cybersyndrome.net/env.cgi', proxy_str=proxy_str)
-        # if response == None:
-        #     return False
-        # soup = BeautifulSoup(response.text, 'lxml')
-        # try:
-        #     proxy_tds = soup.find('td', string='REMOTE_ADDR').next_siblings
-        # except:
-        #     return False
-        # has_find = False
-        # check_proxy = ''
-        # for td_item in proxy_tds:
-        #     if isinstance(td_item, NavigableString):
-        #         continue
-        #     searchObj = re.search(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}', td_item.get_text())
-        #     if searchObj:
-        #         has_find = True
-        #         check_proxy = searchObj.group()
-        #         check_proxy = ''.join(check_proxy.split())
-        # if not has_find:
-        #     return False
-        # try:
-        #     dd_list = soup.find('div', attrs={'id': 'sidebar'}).find('dl').find_all('dd')
-        # except:
-        #     return False
-        # country = ''
-        # anonymous = ''
-        # for dd_item in dd_list:
-        #     if dd_item.find('span') == None:
-        #         country = dd_item.get_text()
-        #         country = ''.join(country.split())
-        #     else:
-        #         anonymous = dd_item.find('span').get_text()
-        #         anonymous = ''.join(anonymous.split())
-        # print('check_proxy:', check_proxy, '; country:', country, '; anonymous:', anonymous)
-        # if check_proxy == host_ip:
-        #     return False
-        # elif country != '中国(China)':
-        #     return False
-        # elif anonymous == 'Non-Anonymous':
-        #     return False
-        # else:
-        #     return True
+    m_headers["X-CS-Sid"] = sid
+    m_headers["X-CS-Proxy"] = proxy_str
+    res = cls.requests_post('http://www.cybersyndrome.net/pc_s.cgi?t=' 
+        + str(int(round(time.time()*1000))), headers = m_headers);
+    
+    checkResult = urllib.unquote(res.headers["X-CS-Message"])
+    if checkResult.find('Anonymous') != -1 and checkResult.find('Non-Anonymous') == -1:
+        return true
+    else:
+        return false
 
     @classmethod
     @robust_check
