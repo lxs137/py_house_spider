@@ -12,8 +12,8 @@ cd /root/proxy_service
 pip install -r requirements.txt
 
 # start ssdb
-# cd /usr/local/ssdb 
-# ./ssdb-server -d ssdb.conf
+cd /usr/local/ssdb 
+./ssdb-server -d ssdb.conf
 
 # start Flask server
 cd /root/proxy_service/web_service

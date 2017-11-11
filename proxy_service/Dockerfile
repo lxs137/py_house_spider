@@ -9,10 +9,11 @@ RUN cd /root \
     && make \
     && make install
 
-ENTRYPOINT ["/usr/local/ssdb/ssdb-server", "-d", "/usr/local/ssdb/ssdb.conf"]
+RUN cd /root \
+	&& wget -O start.sh https://raw.githubusercontent.com/lxs137/py_house_spider/master/proxy_service/start.sh
 
 EXPOSE 5000
 
 EXPOSE 8888
 
-CMD ["bash", "/root/proxy_service/start.sh"]
+CMD ["bash", "/root/start.sh"]
