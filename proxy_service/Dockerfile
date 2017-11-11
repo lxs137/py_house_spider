@@ -12,6 +12,10 @@ RUN cd /root \
 RUN cd /root \
 	&& wget -O start.sh https://raw.githubusercontent.com/lxs137/py_house_spider/master/proxy_service/start.sh
 
+RUN cd /root \
+	&& wget -O requirements.txt https://raw.githubusercontent.com/lxs137/py_house_spider/master/proxy_service/requirements.txt \
+	&& pip install -r requirements.txt
+
 EXPOSE 5000
 
 EXPOSE 8888
