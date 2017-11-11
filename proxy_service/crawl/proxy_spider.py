@@ -266,36 +266,36 @@ class ProxySpider(object):
     @classmethod
     @robust_check
     def check_anonymous(cls, proxy_str):
-    m_headers = {
-        "Host": "www.cybersyndrome.net",
-        "Connection": "keep-alive",
-        "Content-Length": "0",
-        "X-CS-Proxy": None,
-        "X-CS-Sid": "start",
-        "Origin": "http://www.cybersyndrome.net",
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36",
-        "Content-Type": "application/x-www-form-urlencoded",
-        "Accept": "*/*",
-        "Referer": "http://www.cybersyndrome.net/pc.cgi",
-        "Accept-Encoding": "gzip, deflate",
-        "Accept-Language": "zh-CN,zh;q=0.8,en;q=0.6"
-    };
-    res = cls.requests_post('http://www.cybersyndrome.net/pc_s.cgi?t=' 
-        + str(int(round(time.time()*1000))), headers = m_headers);
-    if res == None or res.status_code != 200:
-        return false
-    sid = res.headers["X-CS-Sid"]
+        m_headers = {
+            "Host": "www.cybersyndrome.net",
+            "Connection": "keep-alive",
+            "Content-Length": "0",
+            "X-CS-Proxy": None,
+            "X-CS-Sid": "start",
+            "Origin": "http://www.cybersyndrome.net",
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36",
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Accept": "*/*",
+            "Referer": "http://www.cybersyndrome.net/pc.cgi",
+            "Accept-Encoding": "gzip, deflate",
+            "Accept-Language": "zh-CN,zh;q=0.8,en;q=0.6"
+        };
+        res = cls.requests_post('http://www.cybersyndrome.net/pc_s.cgi?t=' 
+            + str(int(round(time.time()*1000))), headers = m_headers);
+        if res == None or res.status_code != 200:
+            return false
+        sid = res.headers["X-CS-Sid"]
 
-    m_headers["X-CS-Sid"] = sid
-    m_headers["X-CS-Proxy"] = proxy_str
-    res = cls.requests_post('http://www.cybersyndrome.net/pc_s.cgi?t=' 
-        + str(int(round(time.time()*1000))), headers = m_headers);
-    
-    checkResult = urllib.unquote(res.headers["X-CS-Message"])
-    if checkResult.find('Anonymous') != -1 and checkResult.find('Non-Anonymous') == -1:
-        return true
-    else:
-        return false
+        m_headers["X-CS-Sid"] = sid
+        m_headers["X-CS-Proxy"] = proxy_str
+        res = cls.requests_post('http://www.cybersyndrome.net/pc_s.cgi?t=' 
+            + str(int(round(time.time()*1000))), headers = m_headers);
+
+        checkResult = urllib.unquote(res.headers["X-CS-Message"])
+        if checkResult.find('Anonymous') != -1 and checkResult.find('Non-Anonymous') == -1:
+            return true
+        else:
+            return false
 
     @classmethod
     @robust_check
