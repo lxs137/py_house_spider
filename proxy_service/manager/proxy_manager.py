@@ -32,7 +32,7 @@ class ProxyManager(object):
     def insert_proxy_list(self, name, proxy_list):
         all_list = self.db_conn.get_list(name)
         if all_list == None or len(all_list) == 0:
-            all_list = proxy_list
+            all_list = proxy_list or []
         else:
             for proxy in proxy_list:
                 if all_list.count(proxy) == 0:
@@ -69,7 +69,7 @@ class ProxyManager(object):
     def check_proxies(self):
         all_list = self.db_conn.get_list(ProxyManager.all_list)
         if all_list == None or len(all_list) == 0:
-            return
+            return []
         self.valid_proxy = []
         self.unchecked_proxy = 0
         self.mutli_thread_lock = threading.Lock()

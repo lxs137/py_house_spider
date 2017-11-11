@@ -10,6 +10,7 @@ class SSDBManager(object):
 
     def create_list(self, name, list_data):
         list_size = self.c.qsize(name)
+        list_data = list_data or []
         for item in list_data:
             self.c.qpush(name, item)
         self.c.qpop(name, list_size)

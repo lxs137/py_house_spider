@@ -9,14 +9,10 @@ RUN cd /root \
     && make \
     && make install
 
-RUN cd /root \
-	&& wget -O spider.zip --no-check-certificate https://github.com/lxs137/py_house_spider/archive/master.zip \
-	&& unzip spider.zip \
-	&& cp -r py_house_spider-master/proxy_service /root
-
-RUN cd /root/proxy_service \
-    && pip install -r requirements.txt
+ENTRYPOINT ["/usr/local/ssdb/ssdb-server", "-d", "/usr/local/ssdb/ssdb.conf"]
 
 EXPOSE 5000
+
+EXPOSE 8888
 
 CMD ["bash", "/root/proxy_service/start.sh"]
