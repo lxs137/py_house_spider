@@ -3,7 +3,7 @@ import re
 import requests
 import random
 import time
-import urllib
+import urllib.parse
 from bs4 import BeautifulSoup, NavigableString
 
 
@@ -291,7 +291,7 @@ class ProxySpider(object):
         res = cls.requests_post('http://www.cybersyndrome.net/pc_s.cgi?t=' 
             + str(int(round(time.time()*1000))), headers = m_headers);
 
-        checkResult = urllib.unquote(res.headers["X-CS-Message"])
+        checkResult = urllib.parse.unquote(res.headers["X-CS-Message"])
         if checkResult.find('Anonymous') != -1 and checkResult.find('Non-Anonymous') == -1:
             return true
         else:
