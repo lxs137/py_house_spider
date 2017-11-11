@@ -281,21 +281,21 @@ class ProxySpider(object):
             "Accept-Language": "zh-CN,zh;q=0.8,en;q=0.6"
         };
         res = cls.requests_post('http://www.cybersyndrome.net/pc_s.cgi?t=' 
-            + str(int(round(time.time()*1000))), headers = m_headers);
+            + str(int(round(time.time()*1000))), headers=m_headers);
         if res == None or res.status_code != 200:
-            return false
+            return False
         sid = res.headers["X-CS-Sid"]
 
         m_headers["X-CS-Sid"] = sid
         m_headers["X-CS-Proxy"] = proxy_str
         res = cls.requests_post('http://www.cybersyndrome.net/pc_s.cgi?t=' 
-            + str(int(round(time.time()*1000))), headers = m_headers);
+            + str(int(round(time.time()*1000))), headers=m_headers);
 
         checkResult = urllib.parse.unquote(res.headers["X-CS-Message"])
         if checkResult.find('Anonymous') != -1 and checkResult.find('Non-Anonymous') == -1:
-            return true
+            return True
         else:
-            return false
+            return False
 
     @classmethod
     @robust_check
