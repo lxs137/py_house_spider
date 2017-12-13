@@ -43,6 +43,9 @@ class ProxyManager(object):
         unchecked_list = []
         extend_list = []
 
+        extend_list.append(ProxySpider.get_ip_pool())
+        print('IP pool done: ', extend_list[len(extend_list) - 1])
+
         # extend_list.append(ProxySpider.get_kuaidaili())
         # print('kuaidaili done:', extend_list[len(extend_list) - 1])
 
