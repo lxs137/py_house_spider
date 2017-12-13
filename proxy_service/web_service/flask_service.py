@@ -30,7 +30,7 @@ def get_all_proxies():
 
 @app.route('/refresh/')
 def refresh_proxy_pool():
-    # ProxyManager().check_proxies()
+    ProxyManager().check_proxies()
     return 'Refresh proxy pool'
 
 if __name__ == '__main__':
