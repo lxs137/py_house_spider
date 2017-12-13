@@ -1,3 +1,5 @@
+# DockerImage 
+registry.njuics.cn/fluentd/proxy-pool:latest
 # py_house_spider
 * This project is based on Scrapy(https://doc.scrapy.org/en/1.3/).
 * This project has a proxy pool based on SSDB(http://ssdb.io/zh_cn/).
