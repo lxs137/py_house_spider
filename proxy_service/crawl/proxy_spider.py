@@ -30,6 +30,21 @@ class ProxySpider(object):
 
     @classmethod
     @robust_crawl
+    def get_ip_pool(cls):
+        ipList = []
+        url = 'http://www.httpdaili.com/api.asp?ddbh=101496172835924481&noinfo=true&old=1&sl=100'
+        html = cls.requests_get(url)
+        if html == None:
+            return ipList
+        urls = html.split('\r\n');
+        for url in urls:
+            if url and url != '':
+                ipList.append(url)
+        return ipList
+
+
+    @classmethod
+    @robust_crawl
     def get_kuaidaili(cls):
         # http://www.kuaidaili.com/
         ipList = []
