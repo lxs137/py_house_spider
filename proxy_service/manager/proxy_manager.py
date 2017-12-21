@@ -29,6 +29,13 @@ class ProxyManager(object):
         else:
             return proxy_list
 
+    def get_unchecked_proxies(self):
+        proxy_list = self.db_conn.get_list(ProxyManager.all_list)
+        if proxy_list == None:
+            return []
+        else:
+            return proxy_list
+
     def insert_proxy_list(self, name, proxy_list):
         all_list = self.db_conn.get_list(name)
         if all_list == None or len(all_list) == 0:
@@ -43,26 +50,26 @@ class ProxyManager(object):
         unchecked_list = []
         extend_list = []
 
-        extend_list.append(ProxySpider.get_ip_pool())
-        print('IP pool done: ', extend_list[len(extend_list) - 1])
+        # extend_list.append(ProxySpider.get_ip_pool())
+        # print('IP pool done: ', extend_list[len(extend_list) - 1])
 
-        # extend_list.append(ProxySpider.get_kuaidaili())
-        # print('kuaidaili done:', extend_list[len(extend_list) - 1])
+        extend_list.append(ProxySpider.get_kuaidaili())
+        print('kuaidaili done:', extend_list[len(extend_list) - 1])
 
-        # extend_list.append(ProxySpider.get_66daili())
-        # print('66daili done:', extend_list[len(extend_list) - 1])
+        extend_list.append(ProxySpider.get_66daili())
+        print('66daili done:', extend_list[len(extend_list) - 1])
 
-        # extend_list.append(ProxySpider.get_xicidaili())
-        # print('xicidaili done:', extend_list[len(extend_list) - 1])
+        extend_list.append(ProxySpider.get_xicidaili())
+        print('xicidaili done:', extend_list[len(extend_list) - 1])
 
-        # extend_list.append(ProxySpider.get_mimiip())
-        # print('mimidaili done:', extend_list[len(extend_list) - 1])
+        extend_list.append(ProxySpider.get_mimiip())
+        print('mimidaili done:', extend_list[len(extend_list) - 1])
 
-        # extend_list.append(ProxySpider.get_ip181())
-        # print('ip181daili done:', extend_list[len(extend_list) - 1])
+        extend_list.append(ProxySpider.get_ip181())
+        print('ip181daili done:', extend_list[len(extend_list) - 1])
 
-        # extend_list.append(ProxySpider.get_coderbusy())
-        # print('codebusy done:', extend_list[len(extend_list) - 1])
+        extend_list.append(ProxySpider.get_coderbusy())
+        print('codebusy done:', extend_list[len(extend_list) - 1])
         
         for list_item in extend_list:
             if list_item != None:

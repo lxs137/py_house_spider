@@ -27,8 +27,14 @@ def get_all_proxies():
         proxy_list = []
     return jsonify(data=proxy_list)
 
+@app.route('/get_all_unchecked', methods=['GET'])
+def get_unchecked_proxies():
+    unchecked_list = ProxyManager().get_unchecked_proxies()
+    if unchecked_list == None:
+        unchecked_list = []
+    return jsonify(data=unchecked_list)
 
-@app.route('/refresh/')
+@app.route('/refresh/', methods=['POST'])
 def refresh_proxy_pool():
     ProxyManager().check_proxies()
     return 'Refresh proxy pool'

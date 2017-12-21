@@ -1,4 +1,4 @@
-FROM python:3
+FROM registry.njuics.cn/fluentd/python:3.5
 
 RUN apt-get update && apt-get install unzip
 
