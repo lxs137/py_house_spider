@@ -4,6 +4,7 @@ import requests
 import random
 import time
 import urllib.parse
+import sys
 from bs4 import BeautifulSoup, NavigableString
 
 
@@ -34,14 +35,14 @@ class ProxySpider(object):
         ipList = []
         url = 'http://www.httpdaili.com/api.asp?ddbh=105357597956187379&noinfo=true&sl=5000'
         html = cls.requests_get(url)
-        print(html)
+        print(html, file=sys.stderr)
         if html == None:
             return ipList
         urls = html.split('\r\n');
         for url in urls:
             if url and url != '':
                 ipList.append(url)
-        print(ipList)
+        print(ipList, file=sys.stderr)
         return ipList
 
 
