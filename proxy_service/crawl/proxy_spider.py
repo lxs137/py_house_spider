@@ -34,13 +34,14 @@ class ProxySpider(object):
         ipList = []
         url = 'http://www.httpdaili.com/api.asp?ddbh=105357597956187379&noinfo=true&sl=5000'
         html = cls.requests_get(url)
-        print html
+        print(html)
         if html == None:
             return ipList
         urls = html.split('\r\n');
         for url in urls:
             if url and url != '':
                 ipList.append(url)
+        print(ipList)
         return ipList
 
 
