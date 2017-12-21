@@ -32,7 +32,7 @@ class ProxySpider(object):
     @robust_crawl
     def get_ip_pool(cls):
         ipList = []
-        url = 'http://www.httpdaili.com/api.asp?ddbh=101496172835924481&noinfo=true&old=1&sl=100'
+        url = 'http://www.httpdaili.com/api.asp?ddbh=105357597956187379&noinfo=true&sl=5000'
         html = cls.requests_get(url)
         if html == None:
             return ipList
