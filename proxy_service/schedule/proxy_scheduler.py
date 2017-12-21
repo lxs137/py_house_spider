@@ -9,7 +9,7 @@ import sys
 
 class ProxyScheduler(object):
 
-    @my_log(log_name='schedule.log')
+    # @my_log(log_name='schedule.log')
     def __init__(self, refresh_freq):
         self.manager = ProxyManager()
         self.scheduler = BlockingScheduler()
@@ -20,7 +20,7 @@ class ProxyScheduler(object):
         self.scheduler.add_job(self.refresh_proxy_pool, 'interval', hours=refresh_freq, next_run_time=refresh_run_time)
         self.scheduler.add_job(self.clear_proxy_pool, 'interval', hours=24, next_run_time=clear_run_time)
 
-    @my_log(log_name='schedule.log')
+    # @my_log(log_name='schedule.log')
     def refresh_proxy_pool(self):
         self.lock.acquire()
         print('Refresh proxy pool: start.')
@@ -32,7 +32,7 @@ class ProxyScheduler(object):
         print('Refresh proxy pool: done.')
         self.lock.release()
 
-    @my_log(log_name='schedule.log')
+    # @my_log(log_name='schedule.log')
     def clear_proxy_pool(self):
         self.lock.acquire()
         print('Clear proxy pool: start.')
@@ -44,11 +44,11 @@ class ProxyScheduler(object):
         print('Clear proxy pool: done.')
         self.lock.release()
 
-    @my_log(log_name='schedule.log')
+    # @my_log(log_name='schedule.log')
     def start_scheduler(self):
         self.scheduler.start()
 
-    @my_log(log_name='schedule.log')
+    # @my_log(log_name='schedule.log')
     def __del__(self):
         self.scheduler.remove_all_jobs()
         print('ProxyScheduler: remove all jobs.')
